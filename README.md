@@ -1,1 +1,3 @@
-# neural-cars
+# Neural Cars
+=======
+Cars game AI using neural networks
