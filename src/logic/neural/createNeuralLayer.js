@@ -1,5 +1,5 @@
 import * as R from 'ramda';
-import createNeuron from './createNeuron';
+import createNeuron, {getValue} from './createNeuron';
 
 export const NEURAL_LAYER_TYPE = {
   INPUT: 'INPUT',
@@ -9,6 +9,11 @@ export const NEURAL_LAYER_TYPE = {
 
 export const getNeurons = R.prop('neurons');
 
+export const pluckNeuronsValues = R.compose(
+  R.map(getValue),
+  getNeurons,
+);
+
 /**
  * Creates array of number weights for layer
  *
@@ -16,7 +21,8 @@ export const getNeurons = R.prop('neurons');
  * @param {Number[]}  Array of weights(length === neurons.length)
  */
 export const createLayerWeights = R.compose(
-  R.times(R.always(0)), // initial value is 0
+  // R.times(R.always(0)), // initial value is 0
+  R.times(R.divide(R.__, 10)),
   R.length,
   getNeurons,
 );
@@ -28,12 +34,19 @@ export const createLayerWeights = R.compose(
  * @param {Number}  length
  *
  * @returns {Neuron[]}
+ *
+ * @see
+ *  For initial values see:
+ *  https://medium.com/usf-msds/deep-learning-best-practices-1-weight-initialization-14e5c0295b94
  */
 const createNeuralLayer = R.curry(
   (
     {
       activationFnType,
-      bias = 0,
+      initials = {
+        bias: R.always(0),
+        value: R.always(0),
+      },
     },
     type,
     length,
@@ -42,14 +55,14 @@ const createNeuralLayer = R.curry(
       neurons => ({
         type,
         neurons,
-        bias,
       }),
 
       // create array of neurons
       R.times(
-        R.partial(
-          createNeuron,
-          [activationFnType, 0],
+        index => createNeuron(
+          activationFnType,
+          initials.bias(index),
+          initials.value(index),
         ),
       ),
     )(length)
