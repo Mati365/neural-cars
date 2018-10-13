@@ -13,6 +13,13 @@ module.exports = {
     filename: '[name]-[hash].js',
     publicPath: '/',
   },
+  resolve: {
+    extensions: ['.js', '.jsx', '.json'],
+    modules: [
+      resolve(__dirname, '../node_modules'),
+      resolve(__dirname, '../src'),
+    ],
+  },
   plugins: [
     new HtmlWebpackPlugin(
       {
