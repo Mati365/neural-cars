@@ -1,7 +1,10 @@
 import * as R from 'ramda';
 
 import transformArgsToList from 'utils/transformArgsToList';
-import {createLayerWeights} from './createNeuralLayer';
+import {
+  createLayerWeights,
+  getNeurons,
+} from './createNeuralLayer';
 
 /**
  * Create default, blank neural network,
@@ -21,18 +24,32 @@ export const blankNeuralNetwork = () => ({
  * @returns {NeuralNetwork}
  */
 export const appendNetworkLayer = R.curry(
-  (layer, network) => R.evolve(
-    {
-      layers: R.append(layer), // append layer to list of layers
-      weights: R.ifElse(
-        R.equals(0),
-        () => R.append(createLayerWeights(layer)),
-        R.identity,
-      )(
-        network.layers.length,
-      ),
-    },
-    network,
+  (layer, network) => (
+    R.evolve(
+      {
+        layers: R.append(layer), // append layer to list of layers
+
+        // each layer should be conencted to previous layer using edges(weights)
+        weights: R.ifElse(
+          R.equals(0),
+          R.identity, // ignore input layer
+          // get count of previous layer neurons
+          // and generate for each neuron list of edges that is equal
+          // to length of layer neurons
+          layersLength => (
+            R.append(
+              R.times(
+                () => createLayerWeights(layer),
+                getNeurons(network.layers[layersLength - 1]).length,
+              ),
+            )
+          ),
+        )(
+          network.layers.length,
+        ),
+      },
+      network,
+    )
   ),
 );
 
