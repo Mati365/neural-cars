@@ -4,6 +4,7 @@ const createTanLayer = T.createNeuralLayer({
   activationFnType: T.NEURAL_ACTIVATION_TYPES.TAN_H,
 });
 
+// test
 console.log(
   T.createNeuralNetwork(
     createTanLayer(T.NEURAL_LAYER_TYPE.INPUT, 4),
