@@ -36,10 +36,19 @@ module.exports = {
     rules: [
       {
         test: /\.pug$/,
-        use:  ['raw-loader', 'pug-html-loader']
+        use: ['raw-loader', 'pug-html-loader'],
       },
       {
-        test: /\.js$/,
+        enforce: 'pre',
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        loader: 'eslint-loader',
+        options: {
+          emitError: true,
+        },
+      },
+      {
+        test: /\.jsx?$/,
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
@@ -47,6 +56,31 @@ module.exports = {
             presets: [
               '@babel/preset-env', // polyfill for new browser
               '@babel/preset-react', // react jsx compiler
+            ],
+            plugins: [
+              '@babel/plugin-proposal-nullish-coalescing-operator',
+              '@babel/plugin-proposal-optional-chaining',
+              '@babel/plugin-proposal-logical-assignment-operators',
+              '@babel/plugin-proposal-do-expressions',
+              '@babel/plugin-proposal-function-bind',
+              [
+                '@babel/plugin-proposal-pipeline-operator',
+                {
+                  proposal: 'minimal',
+                },
+              ],
+              [
+                '@babel/plugin-proposal-decorators',
+                {
+                  legacy: true,
+                },
+              ],
+              [
+                '@babel/plugin-proposal-class-properties',
+                {
+                  loose: true,
+                },
+              ],
             ],
           },
         },
