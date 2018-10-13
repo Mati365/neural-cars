@@ -1,5 +1,7 @@
 import * as R from 'ramda';
+
 import transformArgsToList from 'utils/transformArgsToList';
+import {createLayerWeights} from './createNeuralLayer';
 
 /**
  * Create default, blank neural network,
@@ -9,6 +11,7 @@ import transformArgsToList from 'utils/transformArgsToList';
  */
 export const blankNeuralNetwork = () => ({
   layers: [],
+  weights: [], // length should be equal with layers.length - 1(because INPUT has not weights)
 });
 
 /**
@@ -17,14 +20,20 @@ export const blankNeuralNetwork = () => ({
  *
  * @returns {NeuralNetwork}
  */
-export const appendNetworkLayer = R.useWith(
-  R.evolve,
-  [
-    /** LAYER */ layer => ({
-      layers: R.append(layer), // append layer to list
-    }),
-    /** NETWORK */ R.identity,
-  ],
+export const appendNetworkLayer = R.curry(
+  (layer, network) => R.evolve(
+    {
+      layers: R.append(layer), // append layer to list of layers
+      weights: R.ifElse(
+        R.equals(0),
+        () => R.append(createLayerWeights(layer)),
+        R.identity,
+      )(
+        network.layers.length,
+      ),
+    },
+    network,
+  ),
 );
 
 /**

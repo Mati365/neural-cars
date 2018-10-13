@@ -7,6 +7,20 @@ export const NEURAL_LAYER_TYPE = {
   OUTPUT: 'OUTPUT',
 };
 
+export const getNeurons = R.prop('neurons');
+
+/**
+ * Creates array of number weights for layer
+ *
+ * @param {Layer} layer
+ * @param {Number[]}  Array of weights(length === neurons.length)
+ */
+export const createLayerWeights = R.compose(
+  R.times(R.always(0)), // initial value is 0
+  R.length,
+  getNeurons,
+);
+
 /**
  * Creates array of neurons for layer
  *
