@@ -28,11 +28,10 @@ const updateNeuronValue = prevLayerNeurons => (neuron, neuronIndex) => {
     prevLayerNeurons.values,
   );
 
-  return R.assoc(
-    'value',
-    getNeuronActivationValue(inputSum, neuron),
-    neuron,
-  );
+  return {
+    ...neuron,
+    value: getNeuronActivationValue(inputSum, neuron),
+  };
 };
 
 /**

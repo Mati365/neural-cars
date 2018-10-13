@@ -6,7 +6,8 @@ parserOptions:
   sourceType: module
   ecmaFeatures:
     jsx: true
-
+env:
+  browser: true
 rules:
   nonblock-statement-body-position: 0
   jsx-quotes: ['error', 'prefer-single']
