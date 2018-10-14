@@ -22,16 +22,37 @@ export const NEURAL_ACTIVATION_TYPES = {
 };
 
 const NeuralActivationFn = {
-  [NEURAL_ACTIVATION_TYPES.TAN_H]: ::Math.tanh,
+  [NEURAL_ACTIVATION_TYPES.TAN_H]: {
+    plain: ::Math.tanh,
+    derivative: x => 1 - (x ** 2),
+  },
 
-  [NEURAL_ACTIVATION_TYPES.SIGMOID_UNIPOLAR]: (x, B = 1) => (
-    1 / (1 + (Math.E ** ((-B) * x)))
-  ),
+  /**
+   * @see
+   * http://www.aforgenet.com/framework/docs/html/c4a0095a-0465-4931-63e7-4c0cdbe2eacc.htm
+   */
+  [NEURAL_ACTIVATION_TYPES.SIGMOID_UNIPOLAR]: (() => {
+    const plain = (x, B = 1) => 1 / (1 + Math.exp((-B) * x));
+    return {
+      plain,
+      derivative: (x, B) => {
+        const fx = plain(x, B);
+        return fx * (1 - fx);
+      },
+    };
+  })(),
 
-  [NEURAL_ACTIVATION_TYPES.SIGMOID_BIPOLAR]: (x, B = 2) => (
-    (1 - (Math.E ** ((-B) * x)))
-      / (1 + (Math.E ** (B * x)))
-  ),
+  [NEURAL_ACTIVATION_TYPES.SIGMOID_BIPOLAR]: (() => {
+    const plain = (x, B = 1) => {
+      const expVal = Math.exp((-B) * x);
+      return (1 - expVal) / (1 + expVal);
+    };
+
+    return {
+      plain,
+      derivative: (x, B) => (1 - (plain(x, B) ** 2)),
+    };
+  })(),
 };
 
 /**

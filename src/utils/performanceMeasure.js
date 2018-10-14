@@ -5,8 +5,9 @@
 const performanceMeasure = (fn, fnName) => (...args) => {
   const start = performance.now();
   const result = fn(...args);
+  const time = performance.now() - start;
 
-  console.log(`Execution ${fnName} function took: ${performance.now() - start}ms`);
+  console.warn(`Execution ${fnName} function took: ${time}ms, output value:`, result);
   return result;
 };
 

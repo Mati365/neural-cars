@@ -4,7 +4,6 @@ import transformArgsToList from 'utils/transformArgsToList';
 import {
   createLayerWeights,
   getNeurons,
-  pluckLayerNeuronsValues,
 } from './createNeuralLayer';
 
 export const assignWeights = R.assoc('weights');
@@ -97,16 +96,3 @@ export const createWeightedNeuralNetwork = (layers, weights) => R.compose(
   assignWeights(weights),
   createNeuralNetwork(false),
 )(layers);
-
-/**
- * Return neural network outputs
- *
- * @param {NeuralNetwork} network
- *
- * @returns {Number[]} outputs
- */
-export const getNeuralNetworkValues = R.compose(
-  pluckLayerNeuronsValues,
-  R.last,
-  R.prop('layers'),
-);

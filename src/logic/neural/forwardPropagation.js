@@ -1,37 +1,45 @@
-import * as R from 'ramda';
-
-import indexedMap from 'utils/indexedMap';
 import indexedReduce from 'utils/indexedReduce';
 
-import {pluckLayerNeuronsValues} from './createNeuralLayer';
-import NeuralActivationFn from './neuralActivationFn';
+import {
+  setNeuronValues,
+  evolveLayerNeurons,
+} from './createNeuralLayer';
 
+import {
+  getNthLayerOutputs,
+  sumNeuronInputs,
+} from './networkSelectors';
+
+import {
+  getNeuronActivationFn,
+  setNeuronValue,
+} from './createNeuron';
+
+/**
+ * Calc activation value of neuron
+ *
+ * @param {Number}  inputSum  returns sum all weights multipled by input neurons
+ * @param {Neuron}  neuron
+ */
 const getNeuronActivationValue = (inputSum, neuron) => (
-  NeuralActivationFn[neuron.activationFnType](inputSum - neuron.bias)
+  getNeuronActivationFn(neuron).plain(inputSum + neuron.bias)
 );
 
 /**
  * It sums all previous weights connected to neuron
  * It should be optimized!
  *
- * @param {Object}  prevLayerNeurons
+ * @param {LayerValues} prevLayerOutputs
  *
  * @todo
  *  Optimize performance, remove `indexedReduce` to someting faster
  */
-const updateNeuronValue = prevLayerNeurons => (neuron, neuronIndex) => {
-  const inputSum = indexedReduce(
-    (acc, prevNeuronValue, prevNeuronIndex) => (
-      acc + (prevNeuronValue * prevLayerNeurons.weights[prevNeuronIndex][neuronIndex])
-    ),
-    0,
-    prevLayerNeurons.values,
+const activateNeuronValue = prevLayerOutputs => (neuron, neuronIndex) => {
+  const inputSum = sumNeuronInputs(prevLayerOutputs, neuronIndex);
+  return setNeuronValue(
+    getNeuronActivationValue(inputSum, neuron),
+    neuron,
   );
-
-  return {
-    ...neuron,
-    value: getNeuronActivationValue(inputSum, neuron),
-  };
 };
 
 /**
@@ -45,34 +53,30 @@ const forwardPropagation = (inputValues, network) => ({
   layers: indexedReduce(
     (previousLayers, layer, layerIndex) => {
       // ignore inputs layer
-      if (!layerIndex)
-        return [layer];
+      if (!layerIndex) {
+        return [
+          setNeuronValues(
+            inputValues,
+            layer,
+          ),
+        ];
+      }
 
-      // it should be length of previous layer neurons length
-      // and should contain inside each item weights count that
-      // is equal to count of neurons in current layer
-      const prevLayerNeurons = {
-        weights: network.weights[layerIndex - 1],
+      // get values from previous layer to calc input sum
+      const prevLayerOutputs = getNthLayerOutputs(
+        layerIndex - 1,
+        network,
+        previousLayers,
+      );
 
-        // input neurons does not contain value
-        values: (
-          layerIndex === 1
-            ? inputValues
-            : pluckLayerNeuronsValues(previousLayers[layerIndex - 1])
-        ),
-      };
+      const layerEvolve = evolveLayerNeurons(
+        activateNeuronValue(prevLayerOutputs),
+      );
 
       // sum all weights values with all previous neuron values
       return [
         ...previousLayers,
-        R.evolve(
-          {
-            neurons: indexedMap(
-              updateNeuronValue(prevLayerNeurons),
-            ),
-          },
-          layer,
-        ),
+        layerEvolve(layer),
       ];
     },
     [],

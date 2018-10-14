@@ -1,5 +1,7 @@
 import * as R from 'ramda';
-import createNeuron, {getValue} from './createNeuron';
+
+import indexedMap from 'utils/indexedMap';
+import createNeuron, {getNeuronValue, setNeuronValue} from './createNeuron';
 
 export const NEURAL_LAYER_TYPE = {
   INPUT: 'INPUT',
@@ -9,8 +11,26 @@ export const NEURAL_LAYER_TYPE = {
 
 export const getNeurons = R.prop('neurons');
 
+export const setNeuronValues = (values, layer) => R.evolve(
+  {
+    neurons: indexedMap(
+      (neuron, index) => setNeuronValue(
+        values[index],
+        neuron,
+      ),
+    ),
+  },
+  layer,
+);
+
+export const evolveLayerNeurons = fn => R.evolve(
+  {
+    neurons: indexedMap(fn),
+  },
+);
+
 export const pluckLayerNeuronsValues = R.compose(
-  R.map(getValue),
+  R.map(getNeuronValue),
   getNeurons,
 );
 

@@ -1,3 +1,4 @@
+import * as R from 'ramda';
 import * as T from 'logic/neural';
 
 import performanceMeasure from 'utils/performanceMeasure';
@@ -36,16 +37,22 @@ const network = T.createWeightedNeuralNetwork(
   ],
 );
 
-const measuredPropagation = performanceMeasure(T.forwardPropagation);
-const propagatedNetwork = measuredPropagation(
-  [
-    1,
-    1,
-  ],
-  network,
-);
+const measuredForwardPropagation = performanceMeasure(T.forwardPropagation, 'T.forwardPropagation');
+const measuredBackwardPropagation = performanceMeasure(T.backwardPropagation, 'T.backwardPropagation');
+
+const propagatedNetwork = R.compose(
+  R.partial(
+    measuredBackwardPropagation,
+    [[0]],
+  ),
+
+  R.partial(
+    measuredForwardPropagation,
+    [[1, 1]],
+  ),
+)(network);
 
 console.log(
-  propagatedNetwork,
+  'Values:',
   T.getNeuralNetworkValues(propagatedNetwork),
 );
