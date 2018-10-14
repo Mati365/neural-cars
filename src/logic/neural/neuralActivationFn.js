@@ -13,6 +13,7 @@ const reduceObjectToArray = obj => R.reduce(
  * @see
  * https://en.wikipedia.org/wiki/Activation_function
  * https://pl.wikipedia.org/wiki/Funkcja_aktywacji
+ * https://stevenmiller888.github.io/mind-how-to-build-a-neucral-network/
  */
 export const NEURAL_ACTIVATION_TYPES = {
   TAN_H: 0,
@@ -24,12 +25,12 @@ const NeuralActivationFn = {
   [NEURAL_ACTIVATION_TYPES.TAN_H]: ::Math.tanh,
 
   [NEURAL_ACTIVATION_TYPES.SIGMOID_UNIPOLAR]: (x, B = 1) => (
-    1 / (1 + ((Math.E, (-B) * x) ** 2))
+    1 / (1 + (Math.E ** ((-B) * x)))
   ),
 
-  [NEURAL_ACTIVATION_TYPES.SIGMOID_BIPOLAR]: (x, B = 1) => (
-    (1 - ((Math.E, (-B) * x) ** 2))
-      / (1 + ((Math.E, (-B) * x) ** 2))
+  [NEURAL_ACTIVATION_TYPES.SIGMOID_BIPOLAR]: (x, B = 2) => (
+    (1 - (Math.E ** ((-B) * x)))
+      / (1 + (Math.E ** (B * x)))
   ),
 };
 

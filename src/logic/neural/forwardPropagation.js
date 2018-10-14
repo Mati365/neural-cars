@@ -3,7 +3,7 @@ import * as R from 'ramda';
 import indexedMap from 'utils/indexedMap';
 import indexedReduce from 'utils/indexedReduce';
 
-import {pluckNeuronsValues} from './createNeuralLayer';
+import {pluckLayerNeuronsValues} from './createNeuralLayer';
 import NeuralActivationFn from './neuralActivationFn';
 
 const getNeuronActivationValue = (inputSum, neuron) => (
@@ -58,7 +58,7 @@ const forwardPropagation = (inputValues, network) => ({
         values: (
           layerIndex === 1
             ? inputValues
-            : pluckNeuronsValues(previousLayers[layerIndex - 1])
+            : pluckLayerNeuronsValues(previousLayers[layerIndex - 1])
         ),
       };
 

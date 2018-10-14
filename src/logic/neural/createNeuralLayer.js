@@ -9,7 +9,7 @@ export const NEURAL_LAYER_TYPE = {
 
 export const getNeurons = R.prop('neurons');
 
-export const pluckNeuronsValues = R.compose(
+export const pluckLayerNeuronsValues = R.compose(
   R.map(getValue),
   getNeurons,
 );
@@ -19,6 +19,8 @@ export const pluckNeuronsValues = R.compose(
  *
  * @param {Layer} layer
  * @param {Number[]}  Array of weights(length === neurons.length)
+ *
+ * @returns {Neuron[]}
  */
 export const createLayerWeights = R.compose(
   // R.times(R.always(0)), // initial value is 0
@@ -67,6 +69,18 @@ const createNeuralLayer = R.curry(
       ),
     )(length)
   ),
+);
+
+/**
+ * Creates input layer without activation function and initial values
+ *
+ * @returns fn(type, length) => Layer
+ */
+export const createInputNeuralLayer = createNeuralLayer(
+  {
+    activationFnType: null,
+  },
+  NEURAL_LAYER_TYPE.INPUT,
 );
 
 export default createNeuralLayer;

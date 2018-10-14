@@ -4,7 +4,10 @@ import transformArgsToList from 'utils/transformArgsToList';
 import {
   createLayerWeights,
   getNeurons,
+  pluckLayerNeuronsValues,
 } from './createNeuralLayer';
+
+export const assignWeights = R.assoc('weights');
 
 /**
  * Create default, blank neural network,
@@ -18,20 +21,28 @@ export const blankNeuralNetwork = () => ({
 });
 
 /**
- * @param {Layer}           layer
- * @param {NeuralNetwork}   network
+ * @param {Boolean}       createBlankWeights  network will create empty array of weights per layer
+ * @param {Layer}         layer
+ * @param {NeuralNetwork} network
  *
  * @returns {NeuralNetwork}
  */
 export const appendNetworkLayer = R.curry(
-  (layer, network) => (
+  (
+    createBlankWeights,
+    layer,
+    network,
+  ) => (
     R.evolve(
       {
         layers: R.append(layer), // append layer to list of layers
 
         // each layer should be conencted to previous layer using edges(weights)
         weights: R.ifElse(
-          R.equals(0),
+          createBlankWeights
+            ? R.equals(0)
+            : R.T,
+
           R.identity, // ignore input layer
           // get count of previous layer neurons
           // and generate for each neuron list of edges that is equal
@@ -58,15 +69,44 @@ export const appendNetworkLayer = R.curry(
  * Layers are ordered:
  * [Input Layer, ... hidden layers ..., Output Layer]
  *
- * @param {Layer...} layers
+ * @param {Boolean}   createBlankWeights
+ * @param {Layer...}  layers
  *
  * @returns {NeuralNetwork}
  */
-export const createNeuralNetwork = R.compose(
+export const createNeuralNetwork = createBlankWeights => R.compose(
   layers => R.reduce(
-    R.flip(appendNetworkLayer),
+    R.flip(
+      appendNetworkLayer(createBlankWeights),
+    ),
     blankNeuralNetwork(),
     layers,
   ),
   transformArgsToList,
+);
+
+/**
+ * Create network with predefined weights
+ *
+ * @param {Layer[]}   layers
+ * @param {Array[][]} weights
+ *
+ * @returns {NeuralNetwork}
+ */
+export const createWeightedNeuralNetwork = (layers, weights) => R.compose(
+  assignWeights(weights),
+  createNeuralNetwork(false),
+)(layers);
+
+/**
+ * Return neural network outputs
+ *
+ * @param {NeuralNetwork} network
+ *
+ * @returns {Number[]} outputs
+ */
+export const getNeuralNetworkValues = R.compose(
+  pluckLayerNeuronsValues,
+  R.last,
+  R.prop('layers'),
 );
