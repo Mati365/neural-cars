@@ -1,4 +1,7 @@
+import * as R from 'ramda';
+
 import indexedReduce, {indexedReduceRight} from 'utils/indexedReduce';
+import indexedMap from 'utils/indexedMap';
 
 import {
   evolveLayerNeurons,
@@ -16,10 +19,14 @@ import {
 } from './networkSelectors';
 
 const evolveLayerNeuronsDeltas = fn => evolveLayerNeurons(
-  (neuron, neuronIndex) => ({
-    ...neuron,
-    backPropagationDelta: fn(neuron, neuronIndex),
-  }),
+  (neuron, neuronIndex) => {
+    const backPropagationDelta = fn(neuron, neuronIndex);
+
+    return {
+      ...neuron,
+      backPropagationDelta,
+    };
+  },
 );
 
 /**
@@ -54,6 +61,11 @@ const setOutputNeuronsDeltas = (prevLayerOutputs, preferredOutput) => evolveLaye
   },
 );
 
+/**
+ * @param {LayerValues} prevLayerOutputs
+ * @param {LayerValues} nextLayerNeurons
+ * @param {Number[]}    currentLayerWeights
+ */
 const setHiddenNeuronsDeltas = (
   prevLayerOutputs,
   nextLayerNeurons,
@@ -76,51 +88,98 @@ const setHiddenNeuronsDeltas = (
 );
 
 /**
+ * Assign to neurons delta errors
+ *
  * @param {Number[]}      preferredOutput
  * @param {NeuralNetwork} network
  */
 const backwardPropagation = (preferredOutput, network) => {
   const layersLength = network.layers.length;
+  const updatedLayers = indexedReduceRight(
+    (layer, acc, reversedIndex) => {
+      const nonReversedIndex = layersLength - (reversedIndex + 1);
+
+      // ignore input layer
+      if (!nonReversedIndex)
+        return [layer, ...acc];
+
+      // used to calc sum
+      const prevLayerOutputs = getNthLayerOutputs(nonReversedIndex - 1, network);
+
+      // assign deltas
+      const evolveLayer = (
+        // if output layer
+        !reversedIndex
+          ? setOutputNeuronsDeltas(prevLayerOutputs, preferredOutput)
+          : (
+            setHiddenNeuronsDeltas(
+              prevLayerOutputs,
+              getNeurons(acc[0]),
+              network.weights[nonReversedIndex],
+            )
+          )
+      );
+
+      return ([
+        evolveLayer(layer),
+        ...acc,
+      ]);
+    },
+    [],
+    network.layers,
+  );
 
   return ({
     ...network,
-    layers: indexedReduceRight(
-      (layer, acc, reversedIndex) => {
-        const nonReversedIndex = layersLength - (reversedIndex + 1);
-
-        // ignore input layer
-        if (!nonReversedIndex)
-          return [layer, ...acc];
-
-        // used to calc sum
-        const prevLayerOutputs = getNthLayerOutputs(nonReversedIndex - 1, network);
-
-        // const nextLayerDeltaValues = reversedIndex > 0 && {
-        //   weightsToNextLayer: network.weights[layersLength - reversedIndex - 1],
-        //   nextLayerNeuronDeltas: getLayerNeuronsDeltas(acc[0]), // acc[0] was previous next layer
-        // };
-        const evolveLayer = (
-          // if output layer
-          !reversedIndex
-            ? setOutputNeuronsDeltas(prevLayerOutputs, preferredOutput)
-            : (
-              setHiddenNeuronsDeltas(
-                prevLayerOutputs,
-                getNeurons(acc[0]),
-                network.weights[nonReversedIndex],
-              )
-            )
-        );
-
-        return ([
-          evolveLayer(layer),
-          ...acc,
-        ]);
-      },
-      [],
-      network.layers,
-    ),
+    layers: updatedLayers,
   });
 };
 
-export default backwardPropagation;
+const getUpdatedWeight = (speed, oldWeight, neuron) => (
+  oldWeight + (neuron.value * speed * neuron.backPropagationDelta)
+);
+
+const updateWeights = learnSpeed => (network) => {
+  const mapLayerWeights = (layerWeights, layerIndex) => {
+    if (layerIndex + 1 === network.layers.length)
+      return layerWeights;
+
+    return (
+      indexedMap(
+        (weight, weightIndex) => indexedMap(
+          (neuronWeight, neuronIndex) => (
+            neuronWeight + (
+              network.layers[layerIndex].neurons[weightIndex].value
+                * learnSpeed
+                * network.layers[layerIndex + 1].neurons[neuronIndex].backPropagationDelta
+            )
+          ),
+        )(weight),
+        layerWeights,
+      )
+    );
+  };
+
+  return R.evolve(
+    {
+      // update connection weights
+      weights: indexedMap(mapLayerWeights),
+
+      // update neuron biases
+      layers: R.map(
+        evolveLayerNeurons(
+          neuron => ({
+            ...neuron,
+            bias: getUpdatedWeight(learnSpeed, neuron.bias, neuron),
+          }),
+        ),
+      ),
+    },
+    network,
+  );
+};
+
+export default R.compose(
+  updateWeights(0.5),
+  backwardPropagation,
+);
