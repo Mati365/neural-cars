@@ -5,7 +5,7 @@ export const createNeuron = activationFn => ({
   value: 0,
   ...activationFn && {
     bias: 0,
-    delta: 0,
+    errorDelta: 0,
     activationFn,
   },
 });

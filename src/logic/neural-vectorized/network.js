@@ -56,7 +56,7 @@ export const createNeuralNetwork = layersDescriptors => ({
         weightsMatrix: weights || (
           outputLayer
             ? null
-            : createMatrix(layersDescriptors[layerIndex + 1].size, layerSize)
+            : createMatrix(layerSize, layersDescriptors[layerIndex + 1].size)
         ),
       };
     },

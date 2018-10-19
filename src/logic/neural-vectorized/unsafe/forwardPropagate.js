@@ -1,6 +1,27 @@
 import {getNeuronActivationFn} from '../neuron';
 
 /**
+ * Sums all weights and neuron from previous layer
+ *
+ * @param {Layer}   layer
+ * @param {Number}  neuronIndex
+ *
+ * @returns {Number}
+ */
+export const getNeuronsWeightsSum = (layer, neuronIndex) => {
+  const {
+    neuronsMatrix: prevLayerNeurons,
+    weightsMatrix: prevLayerWeights,
+  } = layer;
+
+  let sum = 0;
+  for (let pNeuronIndex = prevLayerNeurons.length - 1; pNeuronIndex >= 0; --pNeuronIndex)
+    sum += prevLayerNeurons[pNeuronIndex].value * prevLayerWeights[pNeuronIndex][neuronIndex];
+
+  return sum;
+};
+
+/**
  * Do not use FP stuff here, it should be as fast as it is possible.
  *
  * @see
@@ -13,7 +34,7 @@ import {getNeuronActivationFn} from '../neuron';
  *
  * @returns {Network}
  */
-const forwardPropagation = (input, network) => {
+const forwardPropagate = (input, network) => {
   const {layers} = network;
   const inputNeurons = layers[0].neuronsMatrix;
 
@@ -26,25 +47,16 @@ const forwardPropagation = (input, network) => {
       neuronsMatrix: layerNeurons,
     } = layers[i];
 
-    const {
-      neuronsMatrix: prevLayerNeurons,
-      weightsMatrix: prevLayerWeights,
-    } = layers[i - 1];
-
     // calc activation value for each neuron in current layer
     for (let j = layerNeurons.length - 1; j >= 0; --j) {
       const neuron = layerNeurons[j];
-      let sum = 0;
-
-      // sum linked weights
-      for (let pNeuronIndex = prevLayerNeurons.length - 1; pNeuronIndex >= 0; --pNeuronIndex)
-        sum += prevLayerNeurons[pNeuronIndex].value * prevLayerWeights[pNeuronIndex][j];
-
-      neuron.value = getNeuronActivationFn(neuron).plain(sum);
+      neuron.value = getNeuronActivationFn(neuron).plain(
+        getNeuronsWeightsSum(layers[i - 1], j),
+      );
     }
   }
 
   return network;
 };
 
-export default forwardPropagation;
+export default forwardPropagate;
