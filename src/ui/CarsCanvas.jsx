@@ -1,29 +1,23 @@
 import React from 'react';
+
+import {attachReducerStore} from './utils/StoreProvider';
 import SimulationCanvas from './SimulationCanvas';
 
-import createResourcePack from './engine/createResourcesPack';
-
-createResourcePack(
+export default
+@attachReducerStore(
   {
-    yellow: 'https://techflourish.com/images/car-clipart-sprite-sheet-1.jpg',
-    blue: 'https://mbtskoudsalg.com/images/race-car-sprite-png-1.png',
+    state: {},
+    actions: {},
   },
 )
-  .subscribe(
-    (cars) => {
-      console.log(cars);
-    },
-  );
-
-export default class CarsCanvas extends React.PureComponent {
-  onUpdateSimulation = () => {
-  }
-
+class CarsCanvas extends React.PureComponent {
   render() {
+    const {activeMode} = this;
+
     return (
-      <SimulationCanvas
-        onUpdateSimulation={this.onUpdateSimulation}
-      />
+      <SimulationCanvas onUpdateSimulation={this.onUpdateSimulation}>
+        {::activeMode.render}
+      </SimulationCanvas>
     );
   }
 }

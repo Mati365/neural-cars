@@ -8,7 +8,6 @@ export const DEFAULT_LOADERS = [
     test: R.test(/\.(png|jpe?g)$/),
     loader: path => new Promise(
       (resolve, reject) => {
-        console.log('exec!');
         const img = new Image;
         img.src = path;
         img.onload = () => resolve(img);
