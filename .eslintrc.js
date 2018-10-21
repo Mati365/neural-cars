@@ -1,4 +1,4 @@
-const path = require('path');
+const {resolve} = require('path');
 
 module.exports = {
   parser: 'babel-eslint',
@@ -29,6 +29,8 @@ module.exports = {
     'no-console': 0,
     'no-underscore-dangle': 0,
     'react/prop-types': 0,
+    'object-curly-newline': 0,
+    'no-unused-expressions': 0,
     curly: 0,
     'new-parens': 0
   },
@@ -37,11 +39,11 @@ module.exports = {
       node: {
         moduleDirectory: [
           'node_modules',
-          'src'
+          resolve(__dirname, 'src'),
         ]
       },
       webpack: {
-        config: path.resolve('config/webpack.config.js'),
+        config: resolve(__dirname, 'config/webpack.config.js'),
       }
     }
   }

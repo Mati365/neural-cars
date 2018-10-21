@@ -52,7 +52,7 @@ const loadResource = loaders => R.converge(
  *
  * @returns {ResourcePack}
  */
-export const createResourcesPack = R.curry(
+export const createLoadersResourcesPack = R.curry(
   (loaders, resources) => {
     const packLoader = loadResource(loaders);
     const totalResources = R.keys(resources).length;
@@ -87,4 +87,4 @@ export const createResourcesPack = R.curry(
   },
 );
 
-export default createResourcesPack(DEFAULT_LOADERS);
+export default createLoadersResourcesPack(DEFAULT_LOADERS);

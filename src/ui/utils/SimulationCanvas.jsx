@@ -10,19 +10,18 @@ import PropTypes from 'prop-types';
 export default class SimulationCanvas extends React.Component {
   static propTypes = {
     maxFPS: PropTypes.number,
-    size: PropTypes.shape({
-      width: PropTypes.number,
-      height: PropTypes.number,
-    }),
+    size: PropTypes
+      .shape({
+        w: PropTypes.number,
+        h: PropTypes.number,
+      })
+      .isRequired,
+    onRenderSimulation: PropTypes.func.isRequired,
     onUpdateSimulation: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     maxFPS: 60,
-    size: {
-      width: 640,
-      height: 425,
-    },
   };
 
   ref = React.createRef();
@@ -48,6 +47,7 @@ export default class SimulationCanvas extends React.Component {
       maxFPS,
       size,
       onUpdateSimulation,
+      onRenderSimulation,
     } = this.props;
 
     const maxFrameTime = 1000 / maxFPS;
@@ -64,8 +64,11 @@ export default class SimulationCanvas extends React.Component {
 
       // render stuff
       ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, size.width, size.height);
+      ctx.fillRect(0, 0, size.w, size.h);
+
+      // app logic
       onUpdateSimulation(delta, size);
+      onRenderSimulation(ctx, size);
 
       // loop forever
       window.requestAnimationFrame(renderFrame);
@@ -80,7 +83,8 @@ export default class SimulationCanvas extends React.Component {
     return (
       <canvas
         ref={this.ref}
-        {...size}
+        width={size.w}
+        height={size.h}
       />
     );
   }

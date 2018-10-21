@@ -36,18 +36,19 @@ const createNetwork = () => {
 
 let testNetwork = createNetwork();
 const AND_TRUTH = [
-  {input: [0, 0, 1], output: [0]},
-  {input: [1, 0, 1], output: [0]},
-  {input: [0, 1, 0], output: [0]},
+  {input: [0, 0, 0], output: [0]},
+  {input: [0, 0, 1], output: [1]},
+  {input: [1, 0, 1], output: [1]},
+  {input: [0, 1, 0], output: [1]},
   {input: [0, 1, 1], output: [1]},
-  {input: [1, 1, 0], output: [0]},
-  {input: [1, 0, 0], output: [0]},
-  {input: [1, 0, 1], output: [0]},
-  {input: [1, 1, 1], output: [1]},
+  {input: [1, 1, 0], output: [1]},
+  {input: [1, 0, 0], output: [1]},
+  {input: [1, 0, 1], output: [1]},
+  {input: [1, 1, 1], output: [0]},
 ];
 
-testNetwork = T.trainNetwork(AND_TRUTH, 0.5, 10000, testNetwork);
-console.log(T.exec([1, 1, 1], testNetwork));
+testNetwork = T.trainNetwork(AND_TRUTH, 0.25, 1000, testNetwork);
+console.log(T.exec([1, 0, 1], testNetwork));
 
 ReactDOM.render(
   <CarsCanvas />,
