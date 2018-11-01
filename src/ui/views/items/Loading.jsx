@@ -46,10 +46,7 @@ export default class LoadingView extends GameView {
       globalResLoadingPercentage(prevState) !== newLoadingPercentage
         && newLoadingPercentage === 1.0
     ) {
-      setTimeout(
-        () => this.loadView(GAME_VIEWS.GAME),
-        1000,
-      );
+      this.loadView(GAME_VIEWS.GAME);
     }
   }
 

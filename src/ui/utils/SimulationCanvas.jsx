@@ -85,6 +85,9 @@ export default class SimulationCanvas extends React.Component {
         ref={this.ref}
         width={size.w}
         height={size.h}
+        style={{
+          imageRendering: 'pixelated',
+        }}
       />
     );
   }

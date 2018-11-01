@@ -13,4 +13,22 @@ export const fillRect = (rect, color, ctx) => {
   ctx.fill();
 };
 
-export const drawLines = () => {};
+export const drawSegments = (segments, color, width, ctx) => {
+  const center = segments[0];
+  const offsetY = Math.sin(segments[0].angle) * center.width;
+  const offsetX = Math.cos(segments[0].angle) * center.width;
+
+  ctx.strokeWidth = width;
+  ctx.strokeStyle = color;
+
+  ctx.beginPath();
+  ctx.moveTo(
+    center.x + offsetX,
+    center.y + offsetY,
+  );
+  ctx.lineTo(
+    center.x - offsetX,
+    center.y - offsetY,
+  );
+  ctx.stroke();
+};
