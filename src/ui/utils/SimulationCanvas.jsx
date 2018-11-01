@@ -16,12 +16,15 @@ export default class SimulationCanvas extends React.Component {
         h: PropTypes.number,
       })
       .isRequired,
+
+    innerRef: PropTypes.object,
     onRenderSimulation: PropTypes.func.isRequired,
     onUpdateSimulation: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     maxFPS: 60,
+    innerRef: null,
   };
 
   ref = React.createRef();
@@ -78,11 +81,18 @@ export default class SimulationCanvas extends React.Component {
   };
 
   render() {
-    const {size} = this.props;
+    const {
+      size,
+      innerRef,
+    } = this.props;
 
     return (
       <canvas
-        ref={this.ref}
+        ref={(element) => {
+          this.ref.current = element;
+          if (innerRef)
+            innerRef.current = element;
+        }}
         width={size.w}
         height={size.h}
         style={{

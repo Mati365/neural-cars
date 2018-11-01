@@ -1,19 +1,5 @@
-import * as CtxUtils from 'ui/utils/CtxUtils';
 import GameView from '../GameView';
-
-const toRadians = deg => (deg * Math.PI / 180);
-
-const TEST_MAP = {
-  segments: [
-    {
-      x: 200,
-      y: 200,
-      angle: toRadians(80),
-      width: 60,
-      length: 100,
-    },
-  ],
-};
+import Car from '../objects/Car';
 
 /**
  * Shows game simulation
@@ -22,12 +8,26 @@ const TEST_MAP = {
  * @export
  */
 export default class GameMainView extends GameView {
+  cars = [
+    new Car(
+      {
+        x: 300,
+        y: 300,
+        w: 32,
+        h: 64,
+      },
+    ),
+  ];
+
+  update(delta) {
+    const {cars} = this;
+    for (let i = 0, n = cars.length; i < n; ++i)
+      cars[i].update(delta);
+  }
+
   render(ctx) {
-    CtxUtils.drawSegments(
-      TEST_MAP.segments,
-      '#ffffff',
-      2,
-      ctx,
-    );
+    const {cars} = this;
+    for (let i = 0, n = cars.length; i < n; ++i)
+      cars[i].render(ctx);
   }
 }

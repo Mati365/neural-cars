@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import * as R from 'ramda';
 
 import GAME_RESOURCES from 'ui/constants/gameResources';
 import createResourcesPack from 'ui/resources/createResourcesPack';
@@ -10,6 +11,22 @@ import {connect} from './utils/StoreProvider';
 import {SimulationCanvas} from './utils';
 import GameViews from './views';
 
+const decorate = R.compose(
+  attachGameStore,
+  connect(
+    (state, actions) => ({
+      // variables
+      gameState: state,
+      activeView: state.activeView,
+
+      // actions
+      onUpdateResourcesPackages: actions.updateResourcesPackages,
+    }),
+    {
+      provideStore: true,
+    },
+  ),
+);
 /**
  * Main game class used to load resources and manage views stuff
  *
@@ -17,20 +34,7 @@ import GameViews from './views';
  * @export
  */
 export default
-@attachGameStore
-@connect(
-  (state, actions) => ({
-    // variables
-    gameState: state,
-    activeView: state.activeView,
-
-    // actions
-    onUpdateResourcesPackages: actions.updateResourcesPackages,
-  }),
-  {
-    provideStore: true,
-  },
-)
+@decorate
 class CarsCanvas extends React.Component {
   static propTypes = {
     resourcePack: PropTypes.objectOf(PropTypes.string),
@@ -41,6 +45,8 @@ class CarsCanvas extends React.Component {
   };
 
   activeViewInstance = null;
+
+  canvasRef = React.createRef();
 
   componentDidMount() {
     const {
@@ -69,6 +75,8 @@ class CarsCanvas extends React.Component {
   }
 
   /**
+   * Update element
+   *
    * @param {Number}  delta
    */
   onUpdate = (delta) => {
@@ -99,6 +107,8 @@ class CarsCanvas extends React.Component {
   };
 
   /**
+   * Switches active game view
+   *
    * @param {Number}  viewType
    */
   loadView = (viewType) => {
@@ -111,8 +121,12 @@ class CarsCanvas extends React.Component {
     // assign new instance
     this.activeViewInstance = new GameViews[viewType](
       store,
+      this.canvasRef?.current,
       this.loadView,
     );
+
+    if (this.activeViewInstance.viewDidMount)
+      this.activeViewInstance.viewDidMount();
   }
 
   render() {
@@ -124,6 +138,7 @@ class CarsCanvas extends React.Component {
         }}
       >
         <SimulationCanvas
+          innerRef={this.canvasRef}
           size={{
             w: 640,
             h: 480,

@@ -31,6 +31,7 @@ module.exports = {
     'react/prop-types': 0,
     'object-curly-newline': 0,
     'no-unused-expressions': 0,
+    'react/forbid-prop-types': 0,
     curly: 0,
     'new-parens': 0
   },

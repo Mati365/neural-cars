@@ -1,8 +1,9 @@
 import * as R from 'ramda';
 
 export default class GameView {
-  constructor(store, loadView) {
+  constructor(store, canvasRef, loadView) {
     this.store = store;
+    this.canvasRef = canvasRef;
     this.loadView = loadView;
 
     this.safeAddStateListener(
