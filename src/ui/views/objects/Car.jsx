@@ -1,5 +1,8 @@
 import {toRadians} from 'logic/math';
-import {addVec2To} from 'logic/math/vec2';
+import {
+  addVec2To,
+  vec2Distance,
+} from 'logic/math/vec2';
 
 import {CtxUtils} from 'ui/utils';
 import {
@@ -13,18 +16,53 @@ const getScalarVector = (angle, scalar) => ({
   y: (Math.sin(angle) * scalar),
 });
 
+/**
+ * Get distance between front and near axle
+ *
+ * @param {Object} axles
+ */
+const getDistanceBetweenAxles = ({front, near}) => (
+  vec2Distance(front[0].rect, near[0].rect)
+);
+
+/**
+ * @see
+ * http://www.iforce2d.net/b2dtut/top-down-car
+ * http://www.asawicki.info/Mirror/Car%20Physics%20for%20Games/Car%20Physics%20for%20Games.html
+ * http://engineeringdotnet.blogspot.com/2010/04/simple-2d-car-physics-in-games.html
+ */
 class CarPhysicsBody {
   constructor(rect, velocity = 0.1) {
     const wheelSize = getPreferredWheelSize(rect);
 
     this.rect = rect;
-    this.wheels = [
-      ...createWheelsAxis(0.15, wheelSize, toRadians(20), rect),
-      ...createWheelsAxis(0.73, wheelSize, 0.0, rect),
-    ];
-
     this.velocity = velocity;
     this.angle = 0;
+
+    this.axles = {
+      front: createWheelsAxis(
+        {
+          axisPos: 0.15,
+          size: wheelSize,
+          angle: toRadians(20),
+        },
+        rect,
+      ),
+      near: createWheelsAxis(
+        {
+          axisPos: 0.75,
+          size: wheelSize,
+          angle: 0,
+        },
+        rect,
+      ),
+    };
+
+    this.distanceBetweenAxies = getDistanceBetweenAxles(this.axles);
+    this.wheels = [
+      ...this.axles.front,
+      ...this.axles.near,
+    ];
   }
 
   updateWheels(delta) {

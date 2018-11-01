@@ -5,12 +5,13 @@ export const getPreferredWheelSize = carSize => ({
   h: carSize.h * 0.2,
 });
 
-export const createWheel = (angle, rect) => ({
+export const createWheel = (angle, rect, flags) => ({
   angle,
   rect,
+  ...flags,
 });
 
-export const createWheelsAxis = (axisPos, size, angle, rect) => {
+export const createWheelsAxis = ({axisPos, size, angle}, rect) => {
   const y = rect.h * axisPos;
 
   return [

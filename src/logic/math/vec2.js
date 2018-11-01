@@ -3,6 +3,13 @@ const vec2 = (x, y) => ({
   y: y || 0,
 });
 
+export const vec2Distance = (v1, v2) => (
+  Math.sqrt(
+    ((v1.x - v2.x) ** 2)
+      + ((v1.y - v2.y) ** 2),
+  )
+);
+
 export const addVec2 = (v1, v2) => ({
   x: v1.x + v2.x,
   y: v1.y + v1.y,
