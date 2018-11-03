@@ -10,9 +10,14 @@ import Car from '../objects/Car';
 export default class GameMainView extends GameView {
   cars = [
     new Car(
+      // car mass center position
       {
         x: 300,
         y: 300,
+      },
+
+      // car size
+      {
         w: 32,
         h: 64,
       },

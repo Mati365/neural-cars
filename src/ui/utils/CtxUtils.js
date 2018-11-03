@@ -23,6 +23,13 @@ export const fillRect = (rect, color, ctx) => {
   );
 };
 
+export const fillCircle = (pos, radius, fill, ctx) => {
+  ctx.beginPath();
+  ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI, false);
+  ctx.fillStyle = fill;
+  ctx.fill();
+};
+
 export const drawSegments = (segments, color, width, ctx) => {
   const center = segments[0];
   const offsetY = Math.sin(segments[0].angle) * center.width;

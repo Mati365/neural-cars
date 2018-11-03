@@ -1,29 +1,18 @@
 import {toRadians} from 'logic/math';
-import {
+import vec2, {
+  addVec2,
   addVec2To,
-  vec2Distance,
+  rotateVec2,
+  scalarToVec2,
+  vec2Center,
 } from 'logic/math/vec2';
 
 import {CtxUtils} from 'ui/utils';
 import {
   getPreferredWheelSize,
-  createWheelsAxis,
   drawWheel,
+  createWheel,
 } from './Wheel';
-
-const getScalarVector = (angle, scalar) => ({
-  x: (Math.cos(angle) * scalar),
-  y: (Math.sin(angle) * scalar),
-});
-
-/**
- * Get distance between front and near axle
- *
- * @param {Object} axles
- */
-const getDistanceBetweenAxles = ({front, near}) => (
-  vec2Distance(front[0].rect, near[0].rect)
-);
 
 /**
  * @see
@@ -32,123 +21,219 @@ const getDistanceBetweenAxles = ({front, near}) => (
  * http://engineeringdotnet.blogspot.com/2010/04/simple-2d-car-physics-in-games.html
  */
 class CarPhysicsBody {
-  constructor(rect, velocity = 0.1) {
-    const wheelSize = getPreferredWheelSize(rect);
+  constructor(pos, size, speed = 0.1) {
+    this.pos = pos;
+    this.size = size;
 
-    this.rect = rect;
-    this.velocity = velocity;
-    this.angle = 0;
+    // speed is scalar, velocity should be vector
+    this.speed = speed;
 
-    this.axles = {
-      front: createWheelsAxis(
-        {
-          axisPos: 0.15,
-          size: wheelSize,
-          angle: toRadians(20),
-        },
-        rect,
+    // angle of whole car
+    this.angle = toRadians(-10);
+
+    // angle of front wheels
+    this.steerAngle = toRadians(-45);
+
+    // wheel / axles constants
+    this.wheelSize = getPreferredWheelSize(size);
+    this.wheelBase = size.h * 0.6; // disance between front axis and back axis
+
+    // mass center is center of car, relative to this
+    // point wheels positions are calculated
+    // todo: change it to no constant?
+    this.massCenter = vec2(size.w / 2, size.h / 2);
+
+    // array of wheels position added to mass center
+    this.wheels = this.getWheels();
+  }
+
+  /**
+   * Creates vector that is relative to center of car but
+   * coordinates are relative to root canvas size(not car)
+   *
+   * @param {Vec2} v
+   */
+  createBodyRelativeVector(v) {
+    const {pos, angle} = this;
+
+    return addVec2(
+      rotateVec2(
+        angle,
+        v,
       ),
-      near: createWheelsAxis(
-        {
-          axisPos: 0.75,
-          size: wheelSize,
-          angle: 0,
-        },
-        rect,
-      ),
-    };
+      pos,
+    );
+  }
 
-    this.distanceBetweenAxies = getDistanceBetweenAxles(this.axles);
-    this.wheels = [
-      ...this.axles.front,
-      ...this.axles.near,
+  /**
+   * Creates new wheels based on whole car position
+   *
+   * @todo
+   *  Optimize performance if its slow
+   */
+  getWheels() {
+    const {
+      massCenter,
+      wheelBase,
+      steerAngle,
+      angle,
+    } = this;
+
+    return [
+      // front left
+      createWheel(
+        angle + steerAngle,
+        this.createBodyRelativeVector({
+          x: -massCenter.x,
+          y: -(wheelBase / 2),
+        }),
+      ),
+
+      // front right
+      createWheel(
+        angle + steerAngle,
+        this.createBodyRelativeVector(
+          {
+            x: massCenter.x,
+            y: -(wheelBase / 2),
+          },
+        ),
+      ),
+
+      // back left
+      createWheel(
+        angle,
+        this.createBodyRelativeVector(
+          {
+            x: -massCenter.x,
+            y: (wheelBase / 2),
+          },
+        ),
+      ),
+
+      // back right
+      createWheel(
+        angle,
+        this.createBodyRelativeVector(
+          {
+            x: massCenter.x,
+            y: (wheelBase / 2),
+          },
+        ),
+      ),
     ];
   }
 
-  updateWheels(delta) {
+  update(delta) {
     const {
-      velocity,
       wheels,
+      speed,
     } = this;
 
-    const deltaVelocity = velocity * delta;
+    // Math.PI / 2 - because wheels are rotated relative to landscape
+    // but they are really rectangles rotated -90*
+    const renderWheelAngle = Math.PI / 2;
 
+    // update wheels pos
     for (let i = wheels.length - 1; i >= 0; --i) {
-      const {
-        rect: wheelRect,
-        angle: wheelAngle,
-      } = wheels[i];
-
-      const wheelVelocity = getScalarVector(
-        wheelAngle + (Math.PI / 2),
-        deltaVelocity,
+      const wheel = wheels[i];
+      const velocity = scalarToVec2(
+        renderWheelAngle + wheel.angle,
+        speed * delta,
       );
 
       addVec2To(
-        wheelVelocity,
-        wheelRect,
+        velocity,
+        wheel.pos,
         -1,
       );
     }
-  }
 
-  update(delta) {
-    this.updateWheels(delta);
+    this.pos = vec2Center(
+      wheels[0].pos,
+      wheels[3].pos,
+    );
+
+    // angle between points
+    const angle = Math.atan2(
+      wheels[2].pos.y - wheels[0].pos.y,
+      wheels[2].pos.x - wheels[0].pos.x,
+    ) - renderWheelAngle;
+
+    // angle
+    this.angle = angle;
+    this.wheels = this.getWheels();
   }
 }
 
 export default class Car {
-  constructor(rect) {
-    this.body = new CarPhysicsBody(rect);
+  constructor(pos, size) {
+    this.body = new CarPhysicsBody(pos, size);
   }
 
   update(delta) {
     this.body.update(delta);
   }
 
-  render(ctx) {
+  renderCarCorpse(ctx) {
     const {
       body: {
         angle,
-        rect,
-        wheels,
+        pos,
+        size,
       },
     } = this;
 
-    const rotateOrigin = {
-      x: rect.w / 2,
-      y: rect.h / 2,
-    };
-
-    // rotation
+    // rotation around mass center
     ctx.save();
     ctx.translate(
-      rect.x + rotateOrigin.x,
-      rect.y + rotateOrigin.y,
+      pos.x,
+      pos.y,
     );
     ctx.rotate(angle);
-    ctx.translate(
-      -rotateOrigin.x,
-      -rotateOrigin.y,
-    );
 
-    // base corpse
     CtxUtils.drawRect(
       {
-        x: 0,
-        y: 0,
-        w: rect.w,
-        h: rect.h,
+        x: -size.w / 2,
+        y: -size.h / 2,
+        w: size.w,
+        h: size.h,
       },
       1,
       '#fff',
       ctx,
     );
 
-    // front axis
-    for (let i = wheels.length - 1; i >= 0; --i)
-      drawWheel(wheels[i], ctx);
-
     ctx.restore();
+  }
+
+  render(ctx) {
+    const {
+      body: {
+        pos,
+        wheels,
+        wheelSize,
+      },
+    } = this;
+
+    this.renderCarCorpse(ctx);
+    for (let i = wheels.length - 1; i >= 0; --i) {
+      const wheel = wheels[i];
+
+      drawWheel(
+        wheel.pos,
+        wheelSize,
+        wheel.angle,
+        ctx,
+      );
+    }
+
+    // draw circle in center of car, debug purpose only
+    CtxUtils.fillCircle(
+      pos,
+      2,
+      '#fff',
+      ctx,
+    );
   }
 }
