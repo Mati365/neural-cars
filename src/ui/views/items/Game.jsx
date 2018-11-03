@@ -12,8 +12,8 @@ import Car from '../objects/Car';
 export default class GameMainView extends GameView {
   cars = [
     new Car({
-      steerAngle: toRadians(-25),
-      speed: 0.5,
+      steerAngle: toRadians(0),
+      speed: 0,
 
       // car mass center position
       pos: {

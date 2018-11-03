@@ -3,6 +3,8 @@ const vec2 = (x, y) => ({
   y: y || 0,
 });
 
+export const ZERO_VEC2 = vec2(0, 0);
+
 export const vec2Distance = (v1, v2) => (
   Math.sqrt(
     ((v1.x - v2.x) ** 2)

@@ -58,10 +58,11 @@ export default class SimulationCanvas extends React.Component {
 
     const renderFrame = (timeStamp) => {
       // calc delta timing to smooth anim
+      const delay = timeStamp - lastFrame;
       const delta = (
         lastFrame === null
           ? 1
-          : Math.min(maxFrameTime, timeStamp - lastFrame) / maxFrameTime
+          : Math.min(maxFrameTime, delay) / maxFrameTime
       );
       lastFrame = timeStamp;
 
@@ -72,6 +73,11 @@ export default class SimulationCanvas extends React.Component {
       // app logic
       onUpdateSimulation(delta, size);
       onRenderSimulation(ctx, size);
+
+      // draw debug stuff
+      ctx.fillStyle = '#fff';
+      ctx.font = '12px Arial';
+      ctx.fillText(`Frame time: ${delay.toFixed(2)}ms`, size.w - 120, 20);
 
       // loop forever
       window.requestAnimationFrame(renderFrame);

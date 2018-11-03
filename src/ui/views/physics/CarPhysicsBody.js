@@ -13,6 +13,10 @@ import {
 } from '../objects/Wheel';
 
 /**
+ * Physics logic of a car, do not place there any render stuff
+ * It must contains business logic of a car, nothing more, nothing less
+ *
+ * @export
  * @see
  * http://www.iforce2d.net/b2dtut/top-down-car
  * http://www.asawicki.info/Mirror/Car%20Physics%20for%20Games/Car%20Physics%20for%20Games.html
@@ -146,14 +150,14 @@ export default class CarPhysicsBody {
     for (let i = wheels.length - 1; i >= 0; --i) {
       const wheel = wheels[i];
       const velocity = scalarToVec2(
-        renderWheelAngle + wheel.angle,
+        wheel.angle - renderWheelAngle,
         speed * delta,
       );
 
       addVec2To(
         velocity,
         wheel.pos,
-        -1,
+        1,
       );
     }
 

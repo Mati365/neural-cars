@@ -30,6 +30,18 @@ export const fillCircle = (pos, radius, fill, ctx) => {
   ctx.fill();
 };
 
+export const drawLine = (v1, v2, color, width, ctx) => {
+  const blurOffset = width <= 1 ? 0.5 : 0;
+
+  ctx.lineWidth = width;
+  ctx.strokeStyle = color;
+
+  ctx.beginPath();
+  ctx.moveTo(v1.x + blurOffset, v1.y + blurOffset);
+  ctx.lineTo(v2.x + blurOffset, v2.y + blurOffset);
+  ctx.stroke();
+};
+
 export const drawSegments = (segments, color, width, ctx) => {
   const center = segments[0];
   const offsetY = Math.sin(segments[0].angle) * center.width;
