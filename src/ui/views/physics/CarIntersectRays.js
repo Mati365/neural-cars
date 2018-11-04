@@ -30,7 +30,20 @@ export default class CarIntersectRays {
     this.raysViewportAngle = raysViewportAngle;
 
     // each ray should update when car move
-    this.rays = createBlankLines(R.always([]))(raysCount);
+    this.rays = this.createRays();
+  }
+
+  /**
+   * Creates array of rays and attaches it
+   * to BORDER of car bodys
+   *
+   * @returns {Line[]}
+   */
+  createRays() {
+    const {raysCount} = this;
+    const rays = createBlankLines(R.always([]))(raysCount);
+
+    return this.updateRaysPositions(rays);
   }
 
   /**
