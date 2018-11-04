@@ -1,7 +1,13 @@
 import * as R from 'ramda';
 
 import toRadians from 'logic/math/toRadians';
-import {createBlankLines} from 'logic/math/line';
+
+import {
+  findLinesRayIntersect,
+  createBlankLines,
+  extractRectCornersLines,
+} from 'logic/math/line';
+
 import {
   ZERO_VEC2,
   scalarToVec2,
@@ -40,10 +46,49 @@ export default class CarIntersectRays {
    * @returns {Line[]}
    */
   createRays() {
-    const {raysCount} = this;
-    const rays = createBlankLines(R.always([]))(raysCount);
+    const {
+      raysCount,
+      body: {
+        pos,
+        corners,
+      },
+    } = this;
 
-    return this.updateRaysPositions(rays);
+    // intersect point between edges of rectangle and lines
+    const bodyLines = extractRectCornersLines(corners);
+
+    /**
+     * iterates over all vectors and tries to find ray intersect with body lines
+     * if found - sets bodyAttachPoint to vector
+     * unless - sets bodyAttachPoint vector to massCenter
+     *
+     * @see
+     *  bodyAttachPoint MUST BE RELATIVE TO BODY CENTER NOT GLOBAL ORIGIN!!!!
+     *  ...due to rotation issues
+     */
+    const setBodyAttachPoints = (ray) => {
+      const bodyIntersectPoint = findLinesRayIntersect(bodyLines, ray) || pos;
+
+      return {
+        ...ray,
+        // make it relative to center pos of body
+        // bodyAttachPoint: ZERO_VEC2,
+        bodyAttachPoint: this.body.toBodyRelativeVector(bodyIntersectPoint),
+      };
+    };
+
+    /**
+     * @todo Remove double updateRaysPosition call,
+     * it mige be done in one call, in theory ofc
+     */
+    return R.compose(
+      ::this.updateRaysPositions,
+      R.map(setBodyAttachPoints),
+      lines => (
+        this.updateRaysPositions(lines, 20000)
+      ),
+      createBlankLines,
+    )(raysCount);
   }
 
   /**
@@ -56,20 +101,22 @@ export default class CarIntersectRays {
    *
    * @returns {Line[]}
    */
-  updateRaysPositions(rays = this.rays) {
+  updateRaysPositions(
+    rays = this.rays,
+    viewDistance = this.viewDistance,
+  ) {
     const {
-      viewDistance,
       raysCount,
       raysViewportAngle,
     } = this;
 
-    const rayAngle = raysViewportAngle / this.raysCount;
+    const rayAngle = raysViewportAngle / (this.raysCount - 1);
     const offset = (Math.PI / 2) - (raysViewportAngle / 2);
 
     for (let i = raysCount - 1; i >= 0; --i) {
       const ray = rays[i];
 
-      ray.from = this.body.createBodyRelativeVector(ZERO_VEC2);
+      ray.from = this.body.createBodyRelativeVector(ray.bodyAttachPoint || ZERO_VEC2);
       ray.to = this.body.createBodyRelativeVector(
         scalarToVec2(
           -(i * rayAngle) - offset,

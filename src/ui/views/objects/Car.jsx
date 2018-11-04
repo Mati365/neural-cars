@@ -61,11 +61,19 @@ export default class Car {
 
     for (let i = rays.length - 1; i >= 0; --i) {
       const ray = rays[i];
+
       CtxUtils.drawLine(
         ray.from,
         ray.to,
         '#444',
         1,
+        ctx,
+      );
+
+      CtxUtils.fillCircle(
+        rays[i].from,
+        2,
+        'red',
         ctx,
       );
     }
@@ -80,11 +88,12 @@ export default class Car {
       },
     } = this;
 
+    // draw car
+    this.renderCarCorpse(ctx);
+
     // render rays lines under car
     this.renderRays(ctx);
 
-    // draw car
-    this.renderCarCorpse(ctx);
     for (let i = wheels.length - 1; i >= 0; --i) {
       const wheel = wheels[i];
 

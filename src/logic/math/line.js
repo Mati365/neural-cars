@@ -1,10 +1,28 @@
 import * as R from 'ramda';
 
-import vec2 from './vec2';
+import vec2, {pickVec2Attrs} from './vec2';
 
 const line = (p1, p2, meta) => ({
   from: p1,
   to: p2,
+  meta,
+});
+
+/**
+ * Creates line from numbers, instead of vectors.
+ * Used in fast square lines diassembly
+ *
+ * @param {Number} x1
+ * @param {Number} y1
+ * @param {Number} x2
+ * @param {Number} y2
+ * @param {Object} meta
+ *
+ * @returns {Line}
+ */
+export const lineFromPoints = (x1, y1, x2, y2, meta) => ({
+  from: vec2(x1, y1),
+  to: vec2(x2, y2),
   meta,
 });
 
@@ -16,8 +34,8 @@ const line = (p1, p2, meta) => ({
  *
  * @returns {Line[]}
  */
-export const createBlankLines = fn => R.times(
-  index => line(...fn(index)),
+export const createBlankLines = R.times(
+  () => line(),
 );
 
 /**
@@ -70,18 +88,42 @@ export const intersectVec2Point = ({from: p1, to: p2}, {from: p3, to: p4}) => {
 };
 
 /**
- * Splits rectangle into array of lines
+ * Transforms cornets points object to array of lines
+ * connected to each other, it is used to mount rays to the rect
  *
- * @param {Rect} rect
+ * @param {RectCorners}  corners
  *
  * @returns {Line[]}
  */
-export const extractRectangleLines = ({x, y, w, h}) => ([
-  /** TOP */ line(x, y, x + w, y),
-  /** BOTTOM */ line(x, y + h, x + w, y + h),
+export const extractRectCornersLines = ({
+  topLeft,
+  topRight,
+  bottomLeft,
+  bottomRight,
+}) => ([
+  /** TOP */ lineFromPoints(topLeft.x, topLeft.y, topRight.x, topRight.y),
+  /** BOTTOM */ lineFromPoints(bottomLeft.x, bottomLeft.y, bottomRight.x, bottomRight.y),
 
-  /** LEFT */ line(x, y, x, y + h),
-  /** RIGHT */ line(x + w, y, x + w, y + h),
+  /** LEFT */ lineFromPoints(topLeft.x, topLeft.y, bottomLeft.x, bottomLeft.y),
+  /** RIGHT */ lineFromPoints(topRight.x, topRight.y, bottomRight.x, bottomRight.y),
 ]);
+
+/**
+ * Check if ray intersect with array of lines
+ *
+ * @param {Line[]}  lines
+ * @param {Line}    ray
+ *
+ * @returns {Vec2}  Intersect position
+ */
+export const findLinesRayIntersect = (lines, ray) => {
+  for (let j = lines.length - 1; j >= 0; --j) {
+    const intersect = intersectVec2Point(ray, lines[j]);
+    if (intersect)
+      return pickVec2Attrs(intersect);
+  }
+
+  return null;
+};
 
 export default line;

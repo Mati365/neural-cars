@@ -4,6 +4,8 @@ const vec2 = (x, y, meta) => ({
   meta,
 });
 
+export const pickVec2Attrs = ({x, y}) => ({x, y});
+
 export const ZERO_VEC2 = vec2(0, 0);
 
 export const vec2Distance = (v1, v2) => (
@@ -21,10 +23,12 @@ export const rotateVec2 = (angle, v) => ({
   y: (Math.sin(angle) * v.x) + (Math.cos(angle) * v.y),
 });
 
-export const addVec2 = (v1, v2) => ({
-  x: v1.x + v2.x,
-  y: v1.y + v2.y,
+export const addVec2 = (v1, v2, direction = 1) => ({
+  x: v1.x + (v2.x * direction),
+  y: v1.y + (v2.y * direction),
 });
+
+export const subVec2 = (v1, v2) => addVec2(v1, v2, -1);
 
 export const vec2Length = v1 => (
   Math.sqrt((v1.x ** 2) + (v1.y ** 2))

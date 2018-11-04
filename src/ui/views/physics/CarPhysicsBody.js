@@ -1,5 +1,7 @@
 import {toRadians} from 'logic/math';
+
 import vec2, {
+  subVec2,
   addVec2,
   addVec2To,
   rotateVec2,
@@ -60,8 +62,47 @@ export default class CarPhysicsBody {
   }
 
   /**
+   * Picks all corners of rotated rectangle,
+   * it is slow, many Math.sin() or Math.cos() calls,
+   * do not use it in rendering.
+   *
+   * @see
+   *  CarIntersectRays::update()
+   *
+   * @returns {Vec2[]}
+   */
+  get corners() {
+    const {size} = this;
+
+    return {
+      topLeft: this.createBodyRelativeVector({
+        x: -size.w / 2,
+        y: -size.h / 2,
+      }),
+
+      topRight: this.createBodyRelativeVector({
+        x: size.w / 2,
+        y: -size.h / 2,
+      }),
+
+      bottomLeft: this.createBodyRelativeVector({
+        x: -size.w / 2,
+        y: size.h / 2,
+      }),
+
+      bottomRight: this.createBodyRelativeVector({
+        x: size.w / 2,
+        y: size.h / 2,
+      }),
+    };
+  }
+
+  /**
    * Creates vector that is relative to center of car but
    * coordinates are relative to root canvas size(not car)
+   *
+   * @see
+   *  transforms local(relative to center car) coordinates to global coordinates
    *
    * @param {Vec2} v
    */
@@ -74,6 +115,26 @@ export default class CarPhysicsBody {
         v,
       ),
       pos,
+    );
+  }
+
+  /**
+   * Inverse of createBodyRelativeVector
+   *
+   * @see
+   *  transforms global vector to body cebter relative vector
+   *
+   * @param {Vec2} v
+   */
+  toBodyRelativeVector(v) {
+    const {pos, angle} = this;
+
+    return rotateVec2(
+      -angle,
+      subVec2(
+        v,
+        pos,
+      ),
     );
   }
 

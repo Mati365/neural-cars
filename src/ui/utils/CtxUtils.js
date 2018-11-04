@@ -24,9 +24,9 @@ export const fillRect = (rect, color, ctx) => {
 };
 
 export const fillCircle = (pos, radius, fill, ctx) => {
+  ctx.fillStyle = fill;
   ctx.beginPath();
   ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI, false);
-  ctx.fillStyle = fill;
   ctx.fill();
 };
 

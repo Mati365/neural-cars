@@ -12,6 +12,7 @@ import Car from '../objects/Car';
 export default class GameMainView extends GameView {
   cars = [
     new Car({
+      angle: toRadians(40),
       steerAngle: toRadians(0),
       speed: 0,
 
