@@ -29,22 +29,24 @@ export default class GameMainView extends GameView {
       },
     }),
 
-    new Car({
-      steerAngle: toRadians(45),
-      speed: 0.5,
+    new Car(
+      {
+        steerAngle: toRadians(45),
+        speed: 0.5,
 
-      // car mass center position
-      pos: {
-        x: 450,
-        y: 250,
-      },
+        // car mass center position
+        pos: {
+          x: 450,
+          y: 250,
+        },
 
-      // car size
-      size: {
-        w: 28,
-        h: 48,
+        // car size
+        size: {
+          w: 28,
+          h: 48,
+        },
       },
-    }),
+    ),
   ];
 
   update(delta) {

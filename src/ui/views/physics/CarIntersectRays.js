@@ -11,6 +11,7 @@ import {
 import {
   ZERO_VEC2,
   scalarToVec2,
+  addVec2,
 } from 'logic/math/vec2';
 
 /**
@@ -22,7 +23,7 @@ export default class CarIntersectRays {
   constructor(
     body,
     {
-      viewDistance = 100,
+      viewDistance = 80,
       raysCount = 9,
       raysViewportAngle = toRadians(120),
     },
@@ -115,13 +116,17 @@ export default class CarIntersectRays {
 
     for (let i = raysCount - 1; i >= 0; --i) {
       const ray = rays[i];
+      const attachPoint = ray.bodyAttachPoint || ZERO_VEC2;
 
-      ray.from = this.body.createBodyRelativeVector(ray.bodyAttachPoint || ZERO_VEC2);
+      ray.from = this.body.createBodyRelativeVector(attachPoint);
       ray.to = this.body.createBodyRelativeVector(
-        scalarToVec2(
-          -(i * rayAngle) - offset,
-          viewDistance,
-          -1,
+        addVec2(
+          attachPoint,
+          scalarToVec2(
+            -(i * rayAngle) - offset,
+            viewDistance,
+            -1,
+          ),
         ),
       );
     }
