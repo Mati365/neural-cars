@@ -1,4 +1,6 @@
 import toRadians from 'logic/math/toRadians';
+
+import line from 'logic/math/line';
 import {
   ZERO_VEC2,
   scalarToVec2,
@@ -7,7 +9,7 @@ import {
 /**
  * @see
  * https://pl.wikipedia.org/wiki/Algorytm_Cohena-Sutherlanda
- * https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
+ * https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/565282#565282
  */
 export default class CarIntersectRays {
   constructor(
@@ -42,21 +44,29 @@ export default class CarIntersectRays {
     const offset = (Math.PI / 2) - (raysViewportAngle / 2);
 
     for (let i = raysCount; i >= 0; --i) {
-      rays.push({
-        from: this.body.createBodyRelativeVector(ZERO_VEC2),
-        to: this.body.createBodyRelativeVector(
-          scalarToVec2(
-            -(i * rayAngle) - offset,
-            viewDistance,
-            -1,
+      rays.push(
+        line(
+          this.body.createBodyRelativeVector(ZERO_VEC2),
+          this.body.createBodyRelativeVector(
+            scalarToVec2(
+              -(i * rayAngle) - offset,
+              viewDistance,
+              -1,
+            ),
           ),
         ),
-      });
+      );
     }
 
     return rays;
   }
 
+  /**
+   * Slooow rays update!
+   *
+   * @todo
+   *  Reduce GC overhead, just update existing array instead recreating
+   */
   update() {
     this.rays = this.getRays();
   }

@@ -1,6 +1,7 @@
-const vec2 = (x, y) => ({
+const vec2 = (x, y, flags) => ({
   x: x || 0,
   y: y || 0,
+  flags,
 });
 
 export const ZERO_VEC2 = vec2(0, 0);
