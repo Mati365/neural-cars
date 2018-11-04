@@ -1,9 +1,24 @@
+import * as R from 'ramda';
+
 import vec2 from './vec2';
 
-const line = (p1, p2) => ({
+const line = (p1, p2, meta) => ({
   from: p1,
   to: p2,
+  meta,
 });
+
+/**
+ * Creates array of line, fn is argumet generator
+ * for function creator
+ *
+ * @param {Function} fn
+ *
+ * @returns {Line[]}
+ */
+export const createBlankLines = fn => R.times(
+  index => line(...fn(index)),
+);
 
 /**
  * Detects collision intersect point between two vectors

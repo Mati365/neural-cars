@@ -1,6 +1,7 @@
-import toRadians from 'logic/math/toRadians';
+import * as R from 'ramda';
 
-import line from 'logic/math/line';
+import toRadians from 'logic/math/toRadians';
+import {createBlankLines} from 'logic/math/line';
 import {
   ZERO_VEC2,
   scalarToVec2,
@@ -29,31 +30,38 @@ export default class CarIntersectRays {
     this.raysViewportAngle = raysViewportAngle;
 
     // each ray should update when car move
-    this.rays = this.getRays();
+    this.rays = createBlankLines(R.always([]))(raysCount);
   }
 
-  getRays() {
+  /**
+   * Because car's position is updating also
+   * rays relative to car angle and other stuff,
+   * do not use pure functions here, it is slow
+   * and GC really dislikes it
+   *
+   * @param {Line[]} rays
+   *
+   * @returns {Line[]}
+   */
+  updateRaysPositions(rays = this.rays) {
     const {
       viewDistance,
       raysCount,
       raysViewportAngle,
     } = this;
 
-    const rays = [];
     const rayAngle = raysViewportAngle / this.raysCount;
     const offset = (Math.PI / 2) - (raysViewportAngle / 2);
 
-    for (let i = raysCount; i >= 0; --i) {
-      rays.push(
-        line(
-          this.body.createBodyRelativeVector(ZERO_VEC2),
-          this.body.createBodyRelativeVector(
-            scalarToVec2(
-              -(i * rayAngle) - offset,
-              viewDistance,
-              -1,
-            ),
-          ),
+    for (let i = raysCount - 1; i >= 0; --i) {
+      const ray = rays[i];
+
+      ray.from = this.body.createBodyRelativeVector(ZERO_VEC2);
+      ray.to = this.body.createBodyRelativeVector(
+        scalarToVec2(
+          -(i * rayAngle) - offset,
+          viewDistance,
+          -1,
         ),
       );
     }
@@ -68,6 +76,6 @@ export default class CarIntersectRays {
    *  Reduce GC overhead, just update existing array instead recreating
    */
   update() {
-    this.rays = this.getRays();
+    this.updateRaysPositions();
   }
 }
