@@ -16,6 +16,7 @@ const createPopulation = (config) => {
       index => ({
         object: creator.object(index),
         neural: creator.neural(index),
+        fitness: 1, // default fitness
       }),
       config.size,
     ),

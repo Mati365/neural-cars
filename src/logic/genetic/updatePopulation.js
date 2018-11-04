@@ -3,15 +3,18 @@
  *
  * @param {Population}  population
  */
-const updatePopulation = (
-  {
+const updatePopulation = (population, ...args) => {
+  const {
     items,
     config: {methods},
-  },
-  ...args
-) => {
-  const {update, canKillItem} = methods;
+  } = population;
 
+  const {
+    update,
+    updateFitness,
+  } = methods;
+
+  let allKilled = true;
   for (let i = 0, n = items.length; i < n; ++i) {
     const item = items[i];
     if (item.killed)
@@ -20,9 +23,16 @@ const updatePopulation = (
     item.object.update(...args);
     update(item, ...args);
 
-    if (canKillItem(item))
+    const newFitness = updateFitness(item, ...args);
+    if (newFitness > 0.02)
+      item.fitness = newFitness;
+    else
       item.killed = true;
+
+    allKilled = false;
   }
+
+  return allKilled;
 };
 
 export default updatePopulation;

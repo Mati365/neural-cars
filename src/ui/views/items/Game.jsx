@@ -1,7 +1,11 @@
 import toRadians from 'logic/math/toRadians';
 import vec2 from 'logic/math/vec2';
 
-import {updatePopulation} from 'logic/genetic';
+import {
+  updatePopulation,
+  resetPopulation,
+} from 'logic/genetic';
+
 import createCarsPopulation from '../neural/createCarsPopulation';
 
 import GameView from '../GameView';
@@ -17,9 +21,33 @@ export default class GameMainView extends GameView {
   board = [
     new Polygon(
       [
+        vec2(100, 70),
+        vec2(200, 70),
+        vec2(200, 120),
+      ],
+    ),
+
+    new Polygon(
+      [
+        vec2(100, 170),
+        vec2(130, 320),
+        vec2(150, 220),
+      ],
+    ),
+
+    new Polygon(
+      [
         vec2(220, 170),
         vec2(320, 120),
-        vec2(320, 220),
+        vec2(300, 200),
+      ],
+    ),
+
+    new Polygon(
+      [
+        vec2(220, 120),
+        vec2(320, 80),
+        vec2(340, 220),
       ],
     ),
 
@@ -28,6 +56,22 @@ export default class GameMainView extends GameView {
         vec2(400, 270),
         vec2(500, 220),
         vec2(500, 420),
+      ],
+    ),
+
+    new Polygon(
+      [
+        vec2(540, 70),
+        vec2(420, 70),
+        vec2(420, 190),
+      ],
+    ),
+
+    new Polygon(
+      [
+        vec2(220, 340),
+        vec2(320, 320),
+        vec2(320, 420),
       ],
     ),
 
@@ -42,12 +86,12 @@ export default class GameMainView extends GameView {
   ];
 
   population = createCarsPopulation(
-    10,
+    30,
     {
       angle: toRadians(0),
       steerAngle: toRadians(0),
       speed: 2.5,
-      maxSpeed: 3,
+      maxSpeed: 4,
 
       // car mass center position
       pos: {
@@ -65,7 +109,10 @@ export default class GameMainView extends GameView {
 
   update(delta) {
     const {population, board} = this;
-    updatePopulation(population, delta, board);
+
+    // if all killed
+    if (updatePopulation(population, delta, board))
+      this.population = resetPopulation(population);
   }
 
   render(ctx) {
@@ -80,7 +127,7 @@ export default class GameMainView extends GameView {
     for (let i = 0, n = cars.length; i < n; ++i) {
       const neuralCar = cars[i];
       if (neuralCar.killed)
-        ctx.globalAlpha = 0.5;
+        ctx.globalAlpha = 0.2;
 
       neuralCar.object.render(ctx);
 

@@ -2,8 +2,8 @@ import * as R from 'ramda';
 
 import * as T from 'logic/neural-vectorized';
 
-import {clamp} from 'logic/math';
 import {normalizeAngle} from 'logic/math/toRadians';
+import {clamp} from 'logic/math';
 import {createPopulation} from 'logic/genetic';
 
 import Car from '../objects/Car';
@@ -34,6 +34,7 @@ const createCarNeural = ({raysCount}) => {
   return T.createNeuralNetwork([
     T.createInputLayer(inputCount),
     createBipolarLayer(inputCount * 2),
+    createBipolarLayer(4),
     createBipolarLayer(outputsCount),
   ]);
 };
@@ -45,9 +46,17 @@ const createCarNeural = ({raysCount}) => {
  *
  * @returns {Boolean}
  */
-const canKillCar = ({object: car}) => (
-  car.intersectRays.isCollisionDetected()
-);
+const updateCarFitness = (
+  {
+    object: {body, intersectRays},
+    fitness,
+  },
+) => {
+  if (intersectRays.isCollisionDetected())
+    return false;
+
+  return fitness + (body.speed / body.maxSpeed);
+};
 
 /**
  * Car AI
@@ -80,8 +89,7 @@ const neuralControlCar = (neuralCar, delta) => {
   );
 
   body.speed = clamp(
-    0,
-    // -body.maxSpeed,
+    body.maxSpeed / 2,
     body.maxSpeed,
     body.speed + neuralOutput[0] * delta / 30,
   );
@@ -104,7 +112,7 @@ const createCarsPopulation = (
   {
     size,
     methods: {
-      canKillItem: canKillCar,
+      updateFitness: updateCarFitness,
       update: neuralControlCar,
       creator: {
         neural: () => createCarNeural(raysConfig),
