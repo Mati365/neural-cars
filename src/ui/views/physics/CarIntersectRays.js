@@ -75,6 +75,9 @@ export default class CarIntersectRays {
         // make it relative to center pos of body
         // bodyAttachPoint: ZERO_VEC2,
         bodyAttachPoint: this.body.toBodyRelativeVector(bodyIntersectPoint),
+
+        // used in collision updater
+        collisionPoints: [],
       };
     };
 
@@ -135,12 +138,39 @@ export default class CarIntersectRays {
   }
 
   /**
+   * Check position between each ray and each element on board
+   *
+   * @param {Line[]} rays
+   */
+  checkCollisions(
+    board,
+    rays = this.rays,
+  ) {
+    for (let i = rays.length - 1; i >= 0; --i) {
+      const ray = rays[i];
+      ray.collisionPoints = [];
+
+      for (let j = board.length - 1; j >= 0; --j) {
+        const boardItem = board[j];
+        if (!boardItem.checkRayCollision)
+          continue;
+
+        // line might see multiple lines
+        const intersectPoint = boardItem.checkRayCollision(ray);
+        if (intersectPoint)
+          ray.collisionPoints.push(intersectPoint);
+      }
+    }
+  }
+
+  /**
    * Slooow rays update!
    *
    * @todo
    *  Reduce GC overhead, just update existing array instead recreating
    */
-  update() {
+  update(delta, board) {
     this.updateRaysPositions();
+    this.checkCollisions(board);
   }
 }

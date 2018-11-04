@@ -1,5 +1,14 @@
 import {CtxUtils} from 'ui/utils';
+import {
+  findLinesRayIntersect,
+  mapPointsToLines,
+} from 'logic/math/line';
 
+/**
+ * Single renderable polygon body, it should be static
+ *
+ * @export
+ */
 export default class Polygon {
   constructor(
     points,
@@ -10,11 +19,17 @@ export default class Polygon {
     } = {},
   ) {
     this.points = points;
+    this.lines = mapPointsToLines(loop, points); // after change points, update lines
+
     this.config = {
       color,
       width,
       loop,
     };
+  }
+
+  checkRayCollision(ray) {
+    return findLinesRayIntersect(this.lines, ray);
   }
 
   render(ctx) {

@@ -17,9 +17,9 @@ export default class Car {
     this.intersectRays = new CarIntersectRays(this.body, raysConfig);
   }
 
-  update(delta) {
+  update(delta, board) {
     this.body.update(delta);
-    this.intersectRays.update(delta);
+    this.intersectRays.update(delta, board);
   }
 
   renderCarCorpse(ctx) {
@@ -61,6 +61,7 @@ export default class Car {
 
     for (let i = rays.length - 1; i >= 0; --i) {
       const ray = rays[i];
+      const {collisionPoints} = ray;
 
       CtxUtils.drawLine(
         ray.from,
@@ -76,6 +77,18 @@ export default class Car {
         'red',
         ctx,
       );
+
+      // draw collision points
+      if (collisionPoints.length) {
+        for (let j = collisionPoints.length - 1; j >= 0; --j) {
+          CtxUtils.fillCircle(
+            collisionPoints[j],
+            2,
+            '#00ff00',
+            ctx,
+          );
+        }
+      }
     }
   }
 

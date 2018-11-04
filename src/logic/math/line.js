@@ -126,4 +126,42 @@ export const findLinesRayIntersect = (lines, ray) => {
   return null;
 };
 
+/**
+ * Transform points list to connected lines
+ *
+ * @see
+ *  CarIntersectRays
+ *
+ * @param {Boolean} loop    If true - links end with start
+ * @param {Vec2[]}  points
+ *
+ * @returns {Line[]}
+ */
+export const mapPointsToLines = (loop, points) => {
+  const lines = [];
+
+  for (let i = 0, n = points.length - 1; i < n; ++i) {
+    const currentPoint = points[i];
+    const nextPoint = points[i + 1];
+
+    lines.push(
+      line(
+        currentPoint,
+        nextPoint,
+      ),
+    );
+  }
+
+  if (loop && points.length > 1) {
+    lines.push(
+      line(
+        points[0],
+        R.last(points),
+      ),
+    );
+  }
+
+  return lines;
+};
+
 export default line;

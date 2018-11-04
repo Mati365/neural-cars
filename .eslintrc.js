@@ -33,7 +33,8 @@ module.exports = {
     'no-unused-expressions': 0,
     'react/forbid-prop-types': 0,
     curly: 0,
-    'new-parens': 0
+    'new-parens': 0,
+    'no-continue': 0
   },
   settings: {
     'import/resolver': {
