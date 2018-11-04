@@ -1,7 +1,11 @@
 import toRadians from 'logic/math/toRadians';
+import vec2 from 'logic/math/vec2';
 
 import GameView from '../GameView';
-import Car from '../objects/Car';
+import {
+  Car,
+  Polygon,
+} from '../objects';
 
 /**
  * Shows game simulation
@@ -10,24 +14,36 @@ import Car from '../objects/Car';
  * @export
  */
 export default class GameMainView extends GameView {
+  board = [
+    new Polygon(
+      [
+        vec2(220, 170),
+        vec2(320, 120),
+        vec2(320, 220),
+      ],
+    ),
+  ];
+
   cars = [
-    new Car({
-      angle: toRadians(40),
-      steerAngle: toRadians(0),
-      speed: 0,
+    new Car(
+      {
+        angle: toRadians(40),
+        steerAngle: toRadians(0),
+        speed: 0,
 
-      // car mass center position
-      pos: {
-        x: 300,
-        y: 300,
-      },
+        // car mass center position
+        pos: {
+          x: 300,
+          y: 300,
+        },
 
-      // car size
-      size: {
-        w: 32,
-        h: 64,
+        // car size
+        size: {
+          w: 32,
+          h: 64,
+        },
       },
-    }),
+    ),
 
     new Car(
       {
@@ -50,13 +66,24 @@ export default class GameMainView extends GameView {
   ];
 
   update(delta) {
-    const {cars} = this;
+    const {
+      cars,
+      board,
+    } = this;
+
     for (let i = 0, n = cars.length; i < n; ++i)
-      cars[i].update(delta);
+      cars[i].update(delta, board);
   }
 
   render(ctx) {
-    const {cars} = this;
+    const {
+      cars,
+      board,
+    } = this;
+
+    for (let i = 0, n = board.length; i < n; ++i)
+      board[i].render(ctx);
+
     for (let i = 0, n = cars.length; i < n; ++i)
       cars[i].render(ctx);
   }
