@@ -31,8 +31,8 @@ export default class CarPhysicsBody {
     speed = 0,
     angle = 0,
     steerAngle = toRadians(0),
-    maxSpeed = 2,
-    maxAngle = toRadians(45),
+    maxSpeed = 3,
+    maxSteerAngle = toRadians(45),
   }) {
     this.pos = pos;
     this.size = size;
@@ -43,7 +43,7 @@ export default class CarPhysicsBody {
 
     // angle of whole car
     this.angle = angle;
-    this.maxAngle = maxAngle;
+    this.maxSteerAngle = maxSteerAngle;
 
     // angle of front wheels
     this.steerAngle = steerAngle;

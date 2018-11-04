@@ -14,6 +14,48 @@ import {
   addVec2,
 } from 'logic/math/vec2';
 
+const pickPercentageIntersectDistance = item => item.meta.uA;
+
+/**
+ * Compares uA values between to intersection vectors,
+ * basically  meta.uA is distance in percentage between
+ * start of ray vector and vector with collision
+ *
+ * @see
+ *  intersectVec2Point
+ *
+ * @param {IntersectPoint} a
+ * @param {IntersectPoint} b
+ *
+ * @returns {IntersectPoint}
+ */
+const compareIntersectPoints = (a, b) => (
+  b && (!a || pickPercentageIntersectDistance(a) > pickPercentageIntersectDistance(b))
+    ? b
+    : a
+);
+
+/**
+ * Picks intersect distance with lowest uA
+ *
+ * @param {Ray} ray
+ * @returns {Point}
+ */
+const getClosestRayIntersectPoint = (ray) => {
+  const {collisionPoints: rayPoints} = ray;
+  let closestPoint = null;
+
+  if (rayPoints.length > 0) {
+    for (let j = rayPoints.length - 1; j >= 0; --j) {
+      const collisionPoint = rayPoints[j];
+      closestPoint = compareIntersectPoints(closestPoint, collisionPoint);
+    }
+  }
+
+  // assign mapped value
+  return closestPoint;
+};
+
 /**
  * @see
  * https://pl.wikipedia.org/wiki/Algorytm_Cohena-Sutherlanda
@@ -53,7 +95,36 @@ export default class CarIntersectRays {
     const {crashDistance} = this;
     const intersect = this.getClosestRaysIntersect();
 
-    return !!intersect && intersect.meta.uA <= crashDistance;
+    return !!intersect && pickPercentageIntersectDistance(intersect) <= crashDistance;
+  }
+
+  /**
+   * Iterates over all rays and picks closes intersection point,
+   * instead of getClosesRaysIntersect(), returns array
+   *
+   * IT IS DEFAULTED TO 1
+   *
+   * @see
+   *  getClosesRaysIntersect
+   *  neuralControlCar
+   *
+   * @returns {Point[]}
+   */
+  pickRaysClosestIntersects() {
+    const {rays} = this;
+    const raysIntersectPoints = [];
+
+    for (let i = rays.length - 1; i >= 0; --i) {
+      const percentageDistance = getClosestRayIntersectPoint(rays[i]);
+
+      raysIntersectPoints[i] = (
+        percentageDistance === null
+          ? 1
+          : pickPercentageIntersectDistance(percentageDistance)
+      );
+    }
+
+    return raysIntersectPoints;
   }
 
   /**
@@ -70,19 +141,11 @@ export default class CarIntersectRays {
     let closestPoint = null;
 
     for (let i = rays.length - 1; i >= 0; --i) {
-      const {collisionPoints: rayPoints} = rays[i];
-
-      if (rayPoints.length > 0) {
-        for (let j = rayPoints.length - 1; j >= 0; --j) {
-          const collisionPoint = rayPoints[j];
-
-          // if closest point is null, assign without checks
-          // detect distance in percentage between source point and collision
-          // if percentage is lower than closestPoint - assign it
-          if (!closestPoint || closestPoint.meta.uA > collisionPoint.meta.uA)
-            closestPoint = collisionPoint;
-        }
-      }
+      const rayClosest = getClosestRayIntersectPoint(rays[i]);
+      closestPoint = compareIntersectPoints(
+        closestPoint,
+        rayClosest,
+      );
     }
 
     return closestPoint;

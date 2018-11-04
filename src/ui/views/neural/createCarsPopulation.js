@@ -1,6 +1,9 @@
 import * as R from 'ramda';
 
 import * as T from 'logic/neural-vectorized';
+
+import {clamp} from 'logic/math';
+import {normalizeAngle} from 'logic/math/toRadians';
 import {createPopulation} from 'logic/genetic';
 
 import Car from '../objects/Car';
@@ -15,7 +18,7 @@ const NEURAL_CAR_OUTPUTS = {
   TURN_INPUT: 1,
 };
 
-const createUnipolarLayer = T.createLayer(T.NEURAL_ACTIVATION_TYPES.SIGMOID_UNIPOLAR);
+const createBipolarLayer = T.createLayer(T.NEURAL_ACTIVATION_TYPES.SIGMOID_BIPOLAR);
 
 /**
  * Creates basic game neural network
@@ -30,8 +33,8 @@ const createCarNeural = ({raysCount}) => {
 
   return T.createNeuralNetwork([
     T.createInputLayer(inputCount),
-    createUnipolarLayer(inputCount * 2),
-    createUnipolarLayer(outputsCount),
+    createBipolarLayer(inputCount * 2),
+    createBipolarLayer(outputsCount),
   ]);
 };
 
@@ -49,9 +52,39 @@ const canKillCar = ({object: car}) => (
 /**
  * Car AI
  *
- * @param {Object}  car
+ * @param {Object}  neuralCar
+ * @param {Number}  delta
  */
-const neuralControlCar = () => {
+const neuralControlCar = (neuralCar, delta) => {
+  const {
+    neural, // ai
+    object: {
+      body,
+      intersectRays,
+    },
+  } = neuralCar;
+
+  const neuralOutput = T.exec(
+    [
+      body.speed / body.maxSpeed, // nornalize speed
+      normalizeAngle(body.angle),
+      ...intersectRays.pickRaysClosestIntersects(),
+    ],
+    neural,
+  );
+
+  body.steerAngle = clamp(
+    -body.maxSteerAngle,
+    body.maxSteerAngle,
+    body.steerAngle + (neuralOutput[1] * delta / 20),
+  );
+
+  body.speed = clamp(
+    0,
+    // -body.maxSpeed,
+    body.maxSpeed,
+    body.speed + neuralOutput[0] * delta / 30,
+  );
 };
 
 /**
