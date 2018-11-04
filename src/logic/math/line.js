@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 
-import vec2, {pickVec2Attrs} from './vec2';
+import vec2 from './vec2';
 
 const line = (p1, p2, meta) => ({
   from: p1,
@@ -120,7 +120,7 @@ export const findLinesRayIntersect = (lines, ray) => {
   for (let j = lines.length - 1; j >= 0; --j) {
     const intersect = intersectVec2Point(ray, lines[j]);
     if (intersect)
-      return pickVec2Attrs(intersect);
+      return intersect;
   }
 
   return null;

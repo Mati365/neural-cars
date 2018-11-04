@@ -23,6 +23,7 @@ export default class CarIntersectRays {
   constructor(
     body,
     {
+      crashDistance = 5,
       viewDistance = 80,
       raysCount = 9,
       raysViewportAngle = toRadians(120),
@@ -33,11 +34,58 @@ export default class CarIntersectRays {
 
     // rays config
     this.viewDistance = viewDistance;
+    this.crashDistance = crashDistance / viewDistance;
+
     this.raysCount = raysCount;
     this.raysViewportAngle = raysViewportAngle;
 
     // each ray should update when car move
     this.rays = this.createRays();
+  }
+
+  /**
+   * Check if car has intersect and if intersect is
+   * lower than accepted non collision distance
+   *
+   * @returns {Boolean}
+   */
+  isCollisionDetected() {
+    const {crashDistance} = this;
+    const intersect = this.getClosestRaysIntersect();
+
+    return !!intersect && intersect.meta.uA <= crashDistance;
+  }
+
+  /**
+   * Iterates over rays and finds ray with closest collision
+   * point, used to determine if car reached collision
+   *
+   * @see
+   *  canKillCar
+   *
+   * @returns {Point}
+   */
+  getClosestRaysIntersect() {
+    const {rays} = this;
+    let closestPoint = null;
+
+    for (let i = rays.length - 1; i >= 0; --i) {
+      const {collisionPoints: rayPoints} = rays[i];
+
+      if (rayPoints.length > 0) {
+        for (let j = rayPoints.length - 1; j >= 0; --j) {
+          const collisionPoint = rayPoints[j];
+
+          // if closest point is null, assign without checks
+          // detect distance in percentage between source point and collision
+          // if percentage is lower than closestPoint - assign it
+          if (!closestPoint || closestPoint.meta.uA > collisionPoint.meta.uA)
+            closestPoint = collisionPoint;
+        }
+      }
+    }
+
+    return closestPoint;
   }
 
   /**

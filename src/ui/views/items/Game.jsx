@@ -1,16 +1,11 @@
 import toRadians from 'logic/math/toRadians';
 import vec2 from 'logic/math/vec2';
 
-import {
-  createPopulation,
-  updatePopulation,
-} from 'logic/genetic';
+import {updatePopulation} from 'logic/genetic';
+import createCarsPopulation from '../neural/createCarsPopulation';
 
 import GameView from '../GameView';
-import {
-  Car,
-  Polygon,
-} from '../objects';
+import {Polygon} from '../objects';
 
 /**
  * Shows game simulation
@@ -46,31 +41,25 @@ export default class GameMainView extends GameView {
     ),
   ];
 
-  population = createPopulation(
+  population = createCarsPopulation(
+    1,
     {
-      size: 1,
+      angle: toRadians(10),
+      steerAngle: toRadians(45),
+      speed: 2.5,
+
+      // car mass center position
+      pos: {
+        x: 300,
+        y: 300,
+      },
+
+      // car size
+      size: {
+        w: 32,
+        h: 64,
+      },
     },
-    () => (
-      new Car(
-        {
-          angle: toRadians(60),
-          steerAngle: toRadians(45),
-          speed: 2.5,
-
-          // car mass center position
-          pos: {
-            x: 300,
-            y: 300,
-          },
-
-          // car size
-          size: {
-            w: 32,
-            h: 64,
-          },
-        },
-      )
-    ),
   );
 
   update(delta) {
@@ -87,7 +76,15 @@ export default class GameMainView extends GameView {
     for (let i = 0, n = board.length; i < n; ++i)
       board[i].render(ctx);
 
-    for (let i = 0, n = cars.length; i < n; ++i)
-      cars[i].render(ctx);
+    for (let i = 0, n = cars.length; i < n; ++i) {
+      const neuralCar = cars[i];
+      if (neuralCar.killed)
+        ctx.globalAlpha = 0.5;
+
+      neuralCar.object.render(ctx);
+
+      if (neuralCar.killed)
+        ctx.globalAlpha = 1;
+    }
   }
 }

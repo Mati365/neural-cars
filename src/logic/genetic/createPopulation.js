@@ -4,16 +4,22 @@ import * as R from 'ramda';
  * Create population with items
  *
  * @param {Object}    config
- * @param {Function}  itemCreatorFn
  *
  * @returns {Population}
  */
-const createPopulation = (config, itemCreatorFn) => ({
-  config,
-  items: R.times(
-    itemCreatorFn,
-    config.size,
-  ),
-});
+const createPopulation = (config) => {
+  const {methods: {creator}} = config;
+
+  return {
+    config,
+    items: R.times(
+      index => ({
+        object: creator.object(index),
+        neural: creator.neural(index),
+      }),
+      config.size,
+    ),
+  };
+};
 
 export default createPopulation;

@@ -5,6 +5,18 @@ import createMatrix from './createMatrix';
 import {createNeuronsVector} from './neuron';
 
 /**
+ * Generates random biases for neural network
+ *
+ * @see
+ *  createNeuralNetwork
+ *
+ * @todo
+ *  check if random biases generated that way will work
+ *  correctly with other activation functions(hope it will)
+ */
+export const getRandomBias = () => (Math.random() * 2.0) - 1.0;
+
+/**
  * Create layer descriptor used in createNeuralNetwork function
  *
  * @param {Function}    activationFn
@@ -56,7 +68,7 @@ export const createNeuralNetwork = layersDescriptors => ({
         weightsMatrix: weights || (
           outputLayer
             ? null
-            : createMatrix(layerSize, layersDescriptors[layerIndex + 1].size)
+            : createMatrix(layerSize, layersDescriptors[layerIndex + 1].size, getRandomBias)
         ),
       };
     },
