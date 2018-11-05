@@ -45,14 +45,6 @@ export default class GameMainView extends GameView {
 
     new Polygon(
       [
-        vec2(220, 120),
-        vec2(320, 80),
-        vec2(340, 220),
-      ],
-    ),
-
-    new Polygon(
-      [
         vec2(400, 270),
         vec2(500, 220),
         vec2(500, 420),
@@ -86,7 +78,7 @@ export default class GameMainView extends GameView {
   ];
 
   population = createCarsPopulation(
-    10,
+    50,
     {
       angle: toRadians(0),
       steerAngle: toRadians(0),
