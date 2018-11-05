@@ -86,11 +86,11 @@ export default class GameMainView extends GameView {
   ];
 
   population = createCarsPopulation(
-    30,
+    10,
     {
       angle: toRadians(0),
       steerAngle: toRadians(0),
-      speed: 2.5,
+      speed: 0,
       maxSpeed: 4,
 
       // car mass center position

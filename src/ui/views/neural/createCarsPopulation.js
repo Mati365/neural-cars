@@ -55,7 +55,7 @@ const updateCarFitness = (
   if (intersectRays.isCollisionDetected())
     return false;
 
-  return fitness + (body.speed / body.maxSpeed);
+  return fitness + body.speed;
 };
 
 /**

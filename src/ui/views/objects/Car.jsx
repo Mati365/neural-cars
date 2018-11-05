@@ -3,6 +3,7 @@ import {drawWheel} from './Wheel';
 
 import {
   CarPhysicsBody,
+  CarAabbBox,
   CarIntersectRays,
 } from '../physics';
 
@@ -14,12 +15,14 @@ import {
 export default class Car {
   constructor(bodyConfig, raysConfig = {}) {
     this.body = new CarPhysicsBody(bodyConfig);
+    this.aabb = new CarAabbBox(this.body);
     this.intersectRays = new CarIntersectRays(this.body, raysConfig);
   }
 
   update(delta, board) {
     this.body.update(delta);
     this.intersectRays.update(delta, board);
+    this.aabb.update(delta);
   }
 
   renderCarCorpse(ctx) {
