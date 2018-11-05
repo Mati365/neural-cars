@@ -22,7 +22,6 @@ export default class Car {
   update(delta, board) {
     this.body.update(delta);
     this.intersectRays.update(delta, board);
-    this.aabb.update(delta);
   }
 
   renderCarCorpse(ctx) {

@@ -5,7 +5,6 @@ import toRadians from 'logic/math/toRadians';
 import {
   findLinesRayIntersect,
   createBlankLines,
-  extractRectCornersLines,
 } from 'logic/math/line';
 
 import {
@@ -65,8 +64,7 @@ export default class CarIntersectRays {
   constructor(
     body,
     {
-      crashDistance = 5,
-      viewDistance = 80,
+      viewDistance = 100,
       raysCount = 8,
       raysViewportAngle = toRadians(180),
     },
@@ -76,26 +74,11 @@ export default class CarIntersectRays {
 
     // rays config
     this.viewDistance = viewDistance;
-    this.crashDistance = crashDistance / viewDistance;
-
     this.raysCount = raysCount;
     this.raysViewportAngle = raysViewportAngle;
 
     // each ray should update when car move
     this.rays = this.createRays();
-  }
-
-  /**
-   * Check if car has intersect and if intersect is
-   * lower than accepted non collision distance
-   *
-   * @returns {Boolean}
-   */
-  isCollisionDetected() {
-    const {crashDistance} = this;
-    const intersect = this.getClosestRaysIntersect();
-
-    return !!intersect && pickPercentageIntersectDistance(intersect) <= crashDistance;
   }
 
   /**
@@ -128,30 +111,6 @@ export default class CarIntersectRays {
   }
 
   /**
-   * Iterates over rays and finds ray with closest collision
-   * point, used to determine if car reached collision
-   *
-   * @see
-   *  canKillCar
-   *
-   * @returns {Point}
-   */
-  getClosestRaysIntersect() {
-    const {rays} = this;
-    let closestPoint = null;
-
-    for (let i = rays.length - 1; i >= 0; --i) {
-      const rayClosest = getClosestRayIntersectPoint(rays[i]);
-      closestPoint = compareIntersectPoints(
-        closestPoint,
-        rayClosest,
-      );
-    }
-
-    return closestPoint;
-  }
-
-  /**
    * Creates array of rays and attaches it
    * to BORDER of car bodys
    *
@@ -162,12 +121,9 @@ export default class CarIntersectRays {
       raysCount,
       body: {
         pos,
-        corners,
+        cornersLines: bodyLines,
       },
     } = this;
-
-    // intersect point between edges of rectangle and lines
-    const bodyLines = extractRectCornersLines(corners);
 
     /**
      * iterates over all vectors and tries to find ray intersect with body lines
@@ -263,11 +219,11 @@ export default class CarIntersectRays {
 
       for (let j = board.length - 1; j >= 0; --j) {
         const boardItem = board[j];
-        if (!boardItem.checkRayCollision)
+        if (!boardItem.checkLineCollision)
           continue;
 
         // line might see multiple lines
-        const intersectPoint = boardItem.checkRayCollision(ray);
+        const intersectPoint = boardItem.checkLineCollision(ray);
         if (intersectPoint)
           ray.collisionPoints.push(intersectPoint);
       }

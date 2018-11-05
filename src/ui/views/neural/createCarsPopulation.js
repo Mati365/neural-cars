@@ -18,6 +18,7 @@ const NEURAL_CAR_OUTPUTS = {
   TURN_INPUT: 1,
 };
 
+// const createBipolarLayer = T.createLayer(T.NEURAL_ACTIVATION_TYPES.SIGMOID_BIPOLAR);
 const createBipolarLayer = T.createLayer(T.NEURAL_ACTIVATION_TYPES.SIGMOID_BIPOLAR);
 
 /**
@@ -34,7 +35,6 @@ const createCarNeural = ({raysCount}) => {
   return T.createNeuralNetwork([
     T.createInputLayer(inputCount),
     createBipolarLayer(inputCount * 2),
-    createBipolarLayer(4),
     createBipolarLayer(outputsCount),
   ]);
 };
@@ -43,16 +43,20 @@ const createCarNeural = ({raysCount}) => {
  * Returns true if car contains collisions ony any layer
  *
  * @param {NeuralItem}  neuralItem
+ * @param {Number}      delta
+ * @param {Board}       board
  *
  * @returns {Boolean}
  */
 const updateCarFitness = (
   {
-    object: {body, intersectRays},
+    object: {body, aabb},
     fitness,
   },
+  delta,
+  board,
 ) => {
-  if (intersectRays.isCollisionDetected())
+  if (aabb.isCollisionDetected(board))
     return false;
 
   return fitness + body.speed;

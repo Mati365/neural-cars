@@ -1,5 +1,7 @@
 import {toRadians} from 'logic/math';
 
+import {extractRectCornersLines} from 'logic/math/line';
+
 import vec2, {
   subVec2,
   addVec2,
@@ -95,6 +97,15 @@ export default class CarPhysicsBody {
         y: size.h / 2,
       }),
     };
+  }
+
+  /**
+   * Returns array of connected together corners lines
+   *
+   * @returns {Line[]}
+   */
+  get cornersLines() {
+    return extractRectCornersLines(this.corners);
   }
 
   /**

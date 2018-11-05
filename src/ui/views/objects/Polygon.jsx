@@ -28,8 +28,8 @@ export default class Polygon {
     };
   }
 
-  checkRayCollision(ray) {
-    return findLinesRayIntersect(this.lines, ray);
+  checkLineCollision(line) {
+    return findLinesRayIntersect(this.lines, line);
   }
 
   render(ctx) {

@@ -18,7 +18,13 @@ const cloneBestNeural = R.compose(
         weightsMatrix: R.unless(
           R.isNil,
           R.map(
-            R.map(weight => (weight + (Math.random() * 2.0) - 1.0)),
+            R.map(
+              weight => (weight + (
+                Math.random() > 0.5
+                  ? ((Math.random() * 2.0) - 1.0) * 0.85
+                  : 0
+              )),
+            ),
           ),
         ),
       },

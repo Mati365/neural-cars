@@ -90,13 +90,13 @@ export default class GameMainView extends GameView {
     {
       angle: toRadians(0),
       steerAngle: toRadians(0),
-      speed: 0,
+      speed: 1,
       maxSpeed: 4,
 
       // car mass center position
       pos: {
         x: 300,
-        y: 300,
+        y: 280,
       },
 
       // car size
