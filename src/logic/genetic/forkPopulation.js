@@ -1,55 +1,15 @@
 import * as R from 'ramda';
 
-import getRandomNumber from 'utils/getRandomNumber';
-// import createPopulation from './createPopulation';
-
-const findBiggestFitnessItem = R.reduce(
-  (acc, item) => (
-    !acc || item.fitness > acc.fitness
-      ? item
-      : acc
-  ),
-  null,
-);
+import getRandomNumber, {selectRandomFromArray} from 'utils/getRandomNumber';
 
 const sumBy = prop => R.compose(
   R.sum,
   R.pluck(prop),
 );
 
-const getParentsByFitness = (count, items) => R.compose(
-  R.takeLast(count),
-  R.sortBy(R.prop('fitness')),
-)(items);
-
-const mutateNeuralNetwork = R.compose(
-  R.objOf('layers'),
-  R.map(
-    R.evolve(
-      {
-        weightsMatrix: R.unless(
-          R.isNil,
-          R.map(
-            R.map(
-              (weight) => {
-                if (Math.random() > 0.85)
-                  return weight * getRandomNumber(0.5, 2);
-
-                if (Math.random() > 0.85)
-                  return weight + getRandomNumber(-1.5, 1.5);
-
-                return weight;
-              },
-            ),
-          ),
-        ),
-      },
-    ),
-  ),
-  R.prop('layers'),
-  R.clone,
-);
-
+/**
+ * Not used, it doesnt work well with cars
+ */
 const pickRandomItemsFromWeightedArray = R.curry(
   (weightProp, count, items) => {
     const sum = sumBy(weightProp)(items);
@@ -74,7 +34,41 @@ const pickRandomItemsFromWeightedArray = R.curry(
   },
 );
 
-const pickRandomParentByFitness = pickRandomItemsFromWeightedArray('fitness');
+export const pickRandomParentByFitness = pickRandomItemsFromWeightedArray('fitness');
+
+const getParentsByFitness = (count, items) => R.compose(
+  R.reverse,
+  R.takeLast(count),
+  R.sortBy(R.prop('fitness')),
+)(items);
+
+const mutateNeuralNetwork = R.compose(
+  R.objOf('layers'),
+  R.map(
+    R.evolve(
+      {
+        weightsMatrix: R.unless(
+          R.isNil,
+          R.map(
+            R.map(
+              (weight) => {
+                if (Math.random() > 0.95)
+                  return weight * getRandomNumber(0.5, 2);
+
+                if (Math.random() > 0.65)
+                  return weight + getRandomNumber(-1.5, 1.5);
+
+                return weight;
+              },
+            ),
+          ),
+        ),
+      },
+    ),
+  ),
+  R.prop('layers'),
+  R.clone,
+);
 
 const crossoverNeuralNetworks = (a, b) => {
   const crossedNeural = R.clone(a);
@@ -103,6 +97,7 @@ const crossoverNeuralNetworks = (a, b) => {
  *
  * @see
  * https://4programmers.net/Z_pogranicza/Sztuczne_sieci_neuronowe_i_algorytmy_genetyczne
+ * https://pl.wikipedia.org/wiki/Algorytm_genetyczny
  *
  * https://stackoverflow.com/a/14020358
  * https://www.tutorialspoint.com/genetic_algorithms/genetic_algorithms_parent_selection.htm
@@ -111,19 +106,15 @@ const crossoverNeuralNetworks = (a, b) => {
  * http://www.cleveralgorithms.com/nature-inspired/evolution/genetic_algorithm.html
  */
 const forkPopulation = (neuralItems) => {
-  const best = getParentsByFitness(8, neuralItems);
+  const parents = getParentsByFitness(3, neuralItems);
   const crossedItems = R.map(
     () => {
-      const parents = pickRandomParentByFitness(2, best);
-
       // ignore mutation, just clone parent
       // maybe it will be better to select the best parent instead random
-      const newItem = (
-        Math.random() > 0.9
-          ? findBiggestFitnessItem(parents).neural
-          : crossoverNeuralNetworks(parents[0].neural, parents[1].neural)
+      const newItem = crossoverNeuralNetworks(
+        selectRandomFromArray(parents).neural,
+        selectRandomFromArray(parents).neural,
       );
-
       return newItem;
     },
     neuralItems,

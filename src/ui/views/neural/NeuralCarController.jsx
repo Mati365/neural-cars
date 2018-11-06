@@ -16,7 +16,6 @@ const NEURAL_CAR_OUTPUTS = {
   TURN_INPUT: 1,
 };
 
-// const createBipolarLayer = T.createLayer(T.NEURAL_ACTIVATION_TYPES.SIGMOID_BIPOLAR);
 const createBipolarLayer = T.createLayer(T.NEURAL_ACTIVATION_TYPES.SIGMOID_BIPOLAR);
 
 /**
@@ -112,8 +111,11 @@ export default class NeuralClass {
       },
     } = this;
 
+    if (!this.startPos)
+      this.startPos = R.clone(body.pos);
+
     if (aabb.isCollisionDetected(board))
-      return fitness;
+      return fitness + vec2Distance(this.startPos, body.pos);
 
     if (this.prevPos)
       body.totalDistance = (body.totalDistance || 0) + vec2Distance(prevPos, body.pos);

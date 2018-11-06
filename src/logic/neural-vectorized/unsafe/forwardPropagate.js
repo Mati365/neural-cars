@@ -50,8 +50,9 @@ const forwardPropagate = (input, network) => {
     // calc activation value for each neuron in current layer
     for (let j = layerNeurons.length - 1; j >= 0; --j) {
       const neuron = layerNeurons[j];
+
       neuron.value = getNeuronActivationFn(neuron).plain(
-        getNeuronsWeightsSum(layers[i - 1], j),
+        getNeuronsWeightsSum(layers[i - 1], j) + neuron.bias,
       );
     }
   }

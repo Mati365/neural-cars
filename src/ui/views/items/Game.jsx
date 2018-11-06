@@ -72,17 +72,17 @@ export default class GameMainView extends GameView {
   ];
 
   population = new NeuralCarPopulation(
-    50,
+    30,
     {
-      angle: toRadians(0),
+      angle: toRadians(90),
       steerAngle: toRadians(0),
       speed: 1,
       maxSpeed: 4,
 
       // car mass center position
       pos: {
-        x: 300,
-        y: 280,
+        x: 40,
+        y: 40,
       },
 
       // car size
