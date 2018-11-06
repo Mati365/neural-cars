@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 
 import getRandomNumber from 'utils/getRandomNumber';
-import createPopulation from './createPopulation';
+// import createPopulation from './createPopulation';
 
 const findBiggestFitnessItem = R.reduce(
   (acc, item) => (
@@ -12,10 +12,15 @@ const findBiggestFitnessItem = R.reduce(
   null,
 );
 
-// const sumBy = prop => R.compose(
-//   R.sum,
-//   R.pluck(prop),
-// );
+const sumBy = prop => R.compose(
+  R.sum,
+  R.pluck(prop),
+);
+
+const getParentsByFitness = (count, items) => R.compose(
+  R.takeLast(count),
+  R.sortBy(R.prop('fitness')),
+)(items);
 
 const mutateNeuralNetwork = R.compose(
   R.objOf('layers'),
@@ -26,7 +31,15 @@ const mutateNeuralNetwork = R.compose(
           R.isNil,
           R.map(
             R.map(
-              weight => (weight + getRandomNumber(-0.25, 0.25)),
+              (weight) => {
+                if (Math.random() > 0.85)
+                  return weight * getRandomNumber(0.5, 2);
+
+                if (Math.random() > 0.85)
+                  return weight + getRandomNumber(-1.5, 1.5);
+
+                return weight;
+              },
             ),
           ),
         ),
@@ -37,35 +50,31 @@ const mutateNeuralNetwork = R.compose(
   R.clone,
 );
 
-// const pickRandomItemsFromWeightedArray = R.curry(
-//   (weightProp, count, items) => {
-//     const sum = sumBy(weightProp)(items);
+const pickRandomItemsFromWeightedArray = R.curry(
+  (weightProp, count, items) => {
+    const sum = sumBy(weightProp)(items);
 
-//     return R.times(
-//       () => {
-//         const randomSum = getRandomNumber(0, sum);
-//         let p = 0;
-//         for (let i = 0, n = items.length; i < n; ++i) {
-//           const item = items[i];
-//           p += item.fitness;
+    return R.times(
+      () => {
+        const randomSum = getRandomNumber(0, sum - 1);
+        let p = 0;
+        for (let i = 0, n = items.length; i < n; ++i) {
+          const item = items[i];
+          p += item.fitness;
 
-//           if (p >= randomSum)
-//             return item;
-//         }
+          if (p >= randomSum)
+            return item;
+        }
 
-//         // it should never happen
-//         return null;
-//       },
-//       count,
-//     );
-//   },
-// );
-// pickRandomItemsFromWeightedArray('fitness');
+        // it should never happen
+        return null;
+      },
+      count,
+    );
+  },
+);
 
-const getParentsByFitness = (count, items) => R.compose(
-  R.takeLast(count),
-  R.sortBy(R.prop('fitness')),
-)(items);
+const pickRandomParentByFitness = pickRandomItemsFromWeightedArray('fitness');
 
 const crossoverNeuralNetworks = (a, b) => {
   const crossedNeural = R.clone(a);
@@ -90,19 +99,22 @@ const crossoverNeuralNetworks = (a, b) => {
 };
 
 /**
+ * @param {NeuralItem[]}  neuralItems
  *
  * @see
+ * https://4programmers.net/Z_pogranicza/Sztuczne_sieci_neuronowe_i_algorytmy_genetyczne
+ *
  * https://stackoverflow.com/a/14020358
  * https://www.tutorialspoint.com/genetic_algorithms/genetic_algorithms_parent_selection.htm
  *
  * Algorithm:
  * http://www.cleveralgorithms.com/nature-inspired/evolution/genetic_algorithm.html
  */
-const resetPopulation = (population) => {
-  const {config, items} = population;
-  const newNeurals = R.map(
+const forkPopulation = (neuralItems) => {
+  const best = getParentsByFitness(8, neuralItems);
+  const crossedItems = R.map(
     () => {
-      const parents = getParentsByFitness(2, items);
+      const parents = pickRandomParentByFitness(2, best);
 
       // ignore mutation, just clone parent
       // maybe it will be better to select the best parent instead random
@@ -114,21 +126,15 @@ const resetPopulation = (population) => {
 
       return newItem;
     },
-    population.items,
+    neuralItems,
   );
 
-  return createPopulation(
-    {
-      ...config,
-      methods: {
-        ...config.methods,
-        creator: {
-          ...config.methods.creator,
-          neural: index => mutateNeuralNetwork(newNeurals[index]),
-        },
-      },
-    },
+  const mutatedNeurals = R.map(
+    mutateNeuralNetwork,
+    crossedItems,
   );
+
+  return mutatedNeurals;
 };
 
-export default resetPopulation;
+export default forkPopulation;

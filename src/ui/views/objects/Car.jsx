@@ -20,8 +20,10 @@ export default class Car {
   }
 
   update(delta, board) {
-    this.body.update(delta);
-    this.intersectRays.update(delta, board);
+    const {body, intersectRays} = this;
+
+    body.update(delta);
+    intersectRays.update(delta, board);
   }
 
   renderCarCorpse(ctx) {
@@ -76,7 +78,7 @@ export default class Car {
       CtxUtils.fillCircle(
         rays[i].from,
         2,
-        'red',
+        '#ff0000',
         ctx,
       );
 
@@ -94,7 +96,13 @@ export default class Car {
     }
   }
 
-  render(ctx) {
+  /**
+   * Car renderer
+   *
+   * @param {Context2D} ctx
+   * @param {String}    mainColor Color filling border
+   */
+  render(ctx, mainColor) {
     const {
       body: {
         pos,
@@ -102,6 +110,8 @@ export default class Car {
         wheelSize,
       },
     } = this;
+
+    mainColor = mainColor || '#fff';
 
     // draw car
     this.renderCarCorpse(ctx);
@@ -116,6 +126,7 @@ export default class Car {
         wheel.pos,
         wheelSize,
         wheel.angle,
+        mainColor,
         ctx,
       );
     }
@@ -124,7 +135,7 @@ export default class Car {
     CtxUtils.fillCircle(
       pos,
       2,
-      '#fff',
+      mainColor,
       ctx,
     );
   }

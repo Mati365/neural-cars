@@ -11,7 +11,7 @@ export const createWheel = (angle, pos, flags) => ({
   ...flags,
 });
 
-export const drawWheel = (pos, rect, angle, ctx) => {
+export const drawWheel = (pos, rect, angle, color, ctx) => {
   ctx.save();
   ctx.translate(
     pos.x,
@@ -26,7 +26,7 @@ export const drawWheel = (pos, rect, angle, ctx) => {
       w: rect.w,
       h: rect.h,
     },
-    '#fff',
+    color,
     ctx,
   );
   ctx.restore();

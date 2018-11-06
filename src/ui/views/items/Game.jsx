@@ -1,15 +1,9 @@
 import toRadians from 'logic/math/toRadians';
 import vec2 from 'logic/math/vec2';
 
-import {
-  updatePopulation,
-  resetPopulation,
-} from 'logic/genetic';
-
-import createCarsPopulation from '../neural/createCarsPopulation';
-
 import GameView from '../GameView';
 import {Polygon} from '../objects';
+import {NeuralCarPopulation} from '../neural';
 
 /**
  * Shows game simulation
@@ -37,9 +31,9 @@ export default class GameMainView extends GameView {
 
     new Polygon(
       [
-        vec2(220, 170),
+        vec2(220, 190),
         vec2(320, 120),
-        vec2(300, 200),
+        vec2(300, 178),
       ],
     ),
 
@@ -77,7 +71,7 @@ export default class GameMainView extends GameView {
     ),
   ];
 
-  population = createCarsPopulation(
+  population = new NeuralCarPopulation(
     50,
     {
       angle: toRadians(0),
@@ -102,29 +96,18 @@ export default class GameMainView extends GameView {
   update(delta) {
     const {population, board} = this;
 
-    // if all killed
-    if (updatePopulation(population, delta, board))
-      this.population = resetPopulation(population);
+    population.update(delta, board);
   }
 
   render(ctx) {
     const {
-      population: {items: cars},
+      population,
       board,
     } = this;
 
     for (let i = 0, n = board.length; i < n; ++i)
       board[i].render(ctx);
 
-    for (let i = 0, n = cars.length; i < n; ++i) {
-      const neuralCar = cars[i];
-      if (neuralCar.killed)
-        ctx.globalAlpha = 0.2;
-
-      neuralCar.object.render(ctx);
-
-      if (neuralCar.killed)
-        ctx.globalAlpha = 1;
-    }
+    population.render(ctx);
   }
 }

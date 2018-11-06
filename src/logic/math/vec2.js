@@ -45,6 +45,11 @@ export const vec2Center = (v1, v2) => ({
   y: v1.y + ((v2.y - v1.y) / 2),
 });
 
+export const angleBetweenPoints = (p1, p2) => Math.atan2(
+  p2.y - p1.y,
+  p2.x - p1.x,
+);
+
 export const addVec2To = (src, dest, direction = 1) => {
   /**
    * It should be shallow copy but it is slow

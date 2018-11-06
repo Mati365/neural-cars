@@ -9,6 +9,7 @@ import vec2, {
   rotateVec2,
   scalarToVec2,
   vec2Center,
+  angleBetweenPoints,
 } from 'logic/math/vec2';
 
 import {
@@ -239,12 +240,10 @@ export default class CarPhysicsBody {
     );
 
     // angle between points
-    const angle = Math.atan2(
-      wheels[2].pos.y - wheels[0].pos.y,
-      wheels[2].pos.x - wheels[0].pos.x,
-    ) - renderWheelAngle;
+    const angle = angleBetweenPoints(wheels[0].pos, wheels[2].pos) - renderWheelAngle;
 
     // angle
+    this.angleDelta = angle - this.angle;
     this.angle = angle;
     this.wheels = this.getWheels();
   }
