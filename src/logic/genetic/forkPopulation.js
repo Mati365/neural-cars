@@ -55,7 +55,7 @@ const mutateNeuralNetwork = R.compose(
                 if (Math.random() > 0.95)
                   return weight * getRandomNumber(0.5, 2);
 
-                if (Math.random() > 0.65)
+                if (Math.random() > 0.85)
                   return weight + getRandomNumber(-1.5, 1.5);
 
                 return weight;

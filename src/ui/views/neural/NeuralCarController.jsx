@@ -31,7 +31,7 @@ const createCarNeural = (raysCount) => {
 
   return T.createNeuralNetwork([
     T.createInputLayer(inputCount),
-    createBipolarLayer(inputCount * 2),
+    createBipolarLayer(Math.floor(inputCount * 2)),
     createBipolarLayer(outputsCount),
   ]);
 };

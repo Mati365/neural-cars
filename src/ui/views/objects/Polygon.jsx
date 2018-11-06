@@ -29,7 +29,9 @@ export default class Polygon {
   }
 
   checkLineCollision(line) {
-    return findLinesRayIntersect(this.lines, line);
+    const {lines} = this;
+
+    return findLinesRayIntersect(lines, line);
   }
 
   render(ctx) {

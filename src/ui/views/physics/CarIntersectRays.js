@@ -5,6 +5,8 @@ import toRadians from 'logic/math/toRadians';
 import {
   findLinesRayIntersect,
   createBlankLines,
+  getClosestRayIntersectPoint,
+  pickPercentageIntersectDistance,
 } from 'logic/math/line';
 
 import {
@@ -12,48 +14,6 @@ import {
   scalarToVec2,
   addVec2,
 } from 'logic/math/vec2';
-
-const pickPercentageIntersectDistance = item => item.meta.uA;
-
-/**
- * Compares uA values between to intersection vectors,
- * basically  meta.uA is distance in percentage between
- * start of ray vector and vector with collision
- *
- * @see
- *  intersectVec2Point
- *
- * @param {IntersectPoint} a
- * @param {IntersectPoint} b
- *
- * @returns {IntersectPoint}
- */
-const compareIntersectPoints = (a, b) => (
-  b && (!a || pickPercentageIntersectDistance(a) > pickPercentageIntersectDistance(b))
-    ? b
-    : a
-);
-
-/**
- * Picks intersect distance with lowest uA
- *
- * @param {Ray} ray
- * @returns {Point}
- */
-const getClosestRayIntersectPoint = (ray) => {
-  const {collisionPoints: rayPoints} = ray;
-  let closestPoint = null;
-
-  if (rayPoints.length > 0) {
-    for (let j = rayPoints.length - 1; j >= 0; --j) {
-      const collisionPoint = rayPoints[j];
-      closestPoint = compareIntersectPoints(closestPoint, collisionPoint);
-    }
-  }
-
-  // assign mapped value
-  return closestPoint;
-};
 
 /**
  * @see
@@ -65,8 +25,8 @@ export default class CarIntersectRays {
     body,
     {
       viewDistance = 100,
-      raysCount = 8,
-      raysViewportAngle = toRadians(180),
+      raysCount = 12,
+      raysViewportAngle = toRadians(270),
     },
   ) {
     // car body
@@ -217,7 +177,7 @@ export default class CarIntersectRays {
       const ray = rays[i];
       ray.collisionPoints = [];
 
-      for (let j = board.length - 1; j >= 0; --j) {
+      for (let j = 0, n = board.length; j < n; ++j) {
         const boardItem = board[j];
         if (!boardItem.checkLineCollision)
           continue;
