@@ -13,11 +13,11 @@ const getParentsByFitness = count => R.compose(
 );
 
 const mutateGene = (gene) => {
-  if (Math.random() > 0.9)
+  if (Math.random() > 0.95)
     return gene * getRandomNumber(-1.1, 1.1);
 
-  if (Math.random() > 0.9)
-    return gene + getRandomNumber(-0.15, 0.15);
+  if (Math.random() > 0.95)
+    return gene + getRandomNumber(-0.05, 0.05);
 
   return gene;
 };
@@ -26,7 +26,7 @@ const mutateGenes = R.map(mutateGene);
 
 const crossoverGenes = (geneA, geneB) => R.times(
   index => (
-    Math.random() > 0.6 ? geneA[index] : geneB[index]
+    Math.random() > 0.4 ? geneA[index] : geneB[index]
   ),
   geneA.length,
 );
@@ -65,7 +65,7 @@ const forkPopulation = (neuralItems) => {
         neural,
       }),
     ),
-    getParentsByFitness(2),
+    getParentsByFitness(4),
   )(neuralItems);
 
   const crossedItems = R.map(

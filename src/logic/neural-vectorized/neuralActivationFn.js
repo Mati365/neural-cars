@@ -23,7 +23,7 @@ export const NEURAL_ACTIVATION_TYPES = {
 
 const NeuralActivationFn = {
   [NEURAL_ACTIVATION_TYPES.TAN_H]: {
-    plain: ::Math.tanh,
+    plain: Math.tanh,
     derivative: x => 1 - (x ** 2),
   },
 

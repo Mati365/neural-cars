@@ -3,7 +3,7 @@ import NeuralActivationFunction from './neuralActivationFn';
 
 export const createNeuron = activationFn => ({
   value: 0,
-  ...activationFn && {
+  ...!R.isNil(activationFn) && {
     bias: 0,
     errorDelta: 0,
     activationFn,
