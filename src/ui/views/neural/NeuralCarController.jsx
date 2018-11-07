@@ -3,8 +3,11 @@ import * as R from 'ramda';
 import * as T from 'logic/neural-vectorized';
 
 import {normalizeAngle} from 'logic/math/toRadians';
-import {vec2Distance} from 'logic/math/vec2';
 import {clamp} from 'logic/math';
+import {
+  vec2Distance,
+  pickVec2Attrs,
+} from 'logic/math/vec2';
 
 const NEURAL_CAR_INPUTS = {
   SPEED_INPUT: 0,
@@ -31,7 +34,9 @@ const createCarNeural = (raysCount) => {
 
   return T.createNeuralNetwork([
     T.createInputLayer(inputCount),
-    createBipolarLayer(Math.floor(inputCount * 2)),
+    createBipolarLayer(
+      Math.floor(inputCount * 2 / 3) + outputsCount,
+    ),
     createBipolarLayer(outputsCount),
   ]);
 };
@@ -42,8 +47,6 @@ const createCarNeural = (raysCount) => {
  * @export
  */
 export default class NeuralClass {
-  fitness = 0;
-
   killed = false;
 
   constructor(car, neural) {
@@ -51,12 +54,16 @@ export default class NeuralClass {
     this.neural = neural || createCarNeural(car.intersectRays.raysCount);
   }
 
+  get fitness() {
+    const {totalDistance} = this;
+    return totalDistance;
+  }
+
   hasCollision(board) {
     const {car: {aabb}} = this;
 
     return aabb.isCollisionDetected(board);
   }
-
 
   /**
    * Hear of car brain, feed neural network with
@@ -101,26 +108,23 @@ export default class NeuralClass {
    *
    * @param {Board} board
    */
-  updateCarFitness(board) {
+  updateStats() {
     const {
-      fitness,
       prevPos,
       car: {
         body,
-        aabb,
       },
     } = this;
 
+    this.totalDistance = (
+      (this.totalDistance || 0)
+        + (prevPos ? vec2Distance(prevPos, body.pos) : 0)
+    );
+
+    this.prevPos = pickVec2Attrs(body.pos);
     if (!this.startPos)
-      this.startPos = R.clone(body.pos);
+      this.startPos = pickVec2Attrs(body.pos);
 
-    if (aabb.isCollisionDetected(board))
-      return fitness + vec2Distance(this.startPos, body.pos);
-
-    if (this.prevPos)
-      body.totalDistance = (body.totalDistance || 0) + vec2Distance(prevPos, body.pos);
-
-    this.prevPos = R.clone(body.pos);
     return body.totalDistance || 0;
   }
 
@@ -135,10 +139,13 @@ export default class NeuralClass {
     this.killed = this.killed || this.hasCollision(board);
 
     if (!this.killed) {
-      this.fitness = this.updateCarFitness(board);
+      this.updateStats(board);
       this.neuralControlCar(delta);
 
       car.update(delta, board);
+
+      if (car.aabb.isCollisionDetected(board))
+        this.killed = true;
     }
   }
 

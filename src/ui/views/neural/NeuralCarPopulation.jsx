@@ -24,7 +24,8 @@ export default class NeuralCarPopulation {
 
     return R.times(
       index => new NeuralCarController(
-        new Car(defaultCarConfig, neurals[index]),
+        new Car(defaultCarConfig),
+        neurals[index],
       ),
       size,
     );
@@ -54,7 +55,7 @@ export default class NeuralCarPopulation {
 
     for (let i = 0, n = items.length; i < n; ++i) {
       const item = items[i];
-      if (bestIndex === null || item.fitness > items[bestIndex].fitness)
+      if (bestIndex === null || item.fitness >= items[bestIndex].fitness)
         bestIndex = i;
 
       if (!item.killed) {
