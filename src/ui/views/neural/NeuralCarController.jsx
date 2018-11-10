@@ -55,8 +55,8 @@ export default class NeuralClass {
   }
 
   get fitness() {
-    const {totalDistance} = this;
-    return totalDistance;
+    const {totalDistance, distanceFromStart} = this;
+    return totalDistance + (distanceFromStart / 2);
   }
 
   hasCollision(board) {
@@ -116,15 +116,16 @@ export default class NeuralClass {
       },
     } = this;
 
+    if (!this.startPos)
+      this.startPos = pickVec2Attrs(body.pos);
+
+    this.distanceFromStart = vec2Distance(this.startPos, body.pos);
     this.totalDistance = (
       (this.totalDistance || 0)
         + (prevPos ? vec2Distance(prevPos, body.pos) : 0)
     );
 
     this.prevPos = pickVec2Attrs(body.pos);
-    if (!this.startPos)
-      this.startPos = pickVec2Attrs(body.pos);
-
     return body.totalDistance || 0;
   }
 

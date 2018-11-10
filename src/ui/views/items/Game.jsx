@@ -99,15 +99,15 @@ export default class GameMainView extends GameView {
     population.update(delta, board);
   }
 
-  render(ctx) {
+  render(ctx, size) {
     const {
       population,
       board,
     } = this;
 
     for (let i = 0, n = board.length; i < n; ++i)
-      board[i].render(ctx);
+      board[i].render(ctx, size);
 
-    population.render(ctx);
+    population.render(ctx, size);
   }
 }

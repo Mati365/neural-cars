@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 
-import forkPopulation from 'logic/genetic/forkPopulation';
+import forkPopulation, {getWinnerFitness} from 'logic/genetic/forkPopulation';
 
 import NeuralCarController from './NeuralCarController';
 import {Car} from '../objects';
@@ -11,6 +11,8 @@ import {Car} from '../objects';
  * @export
  */
 export default class NeuralCarPopulation {
+  generation = 0;
+
   constructor(size, defaultCarConfig) {
     this.size = size;
     this.defaultCarConfig = defaultCarConfig;
@@ -35,8 +37,18 @@ export default class NeuralCarPopulation {
    * Creates new cars population
    */
   nextGeneration() {
-    const {items} = this;
+    const {prevItems} = this;
+    let {items} = this;
 
+    this.generation++;
+
+    // prevent whole population regression
+    if (prevItems && getWinnerFitness(prevItems) > getWinnerFitness(items)) {
+      console.warn('regression!', getWinnerFitness(prevItems), getWinnerFitness(items));
+      items = this.prevItems;
+    }
+
+    this.prevItems = items;
     this.items = this.createGeneration(
       forkPopulation(items),
     );
@@ -74,8 +86,14 @@ export default class NeuralCarPopulation {
    *
    * @param {Context2D} ctx
    */
-  render(ctx) {
-    const {items, bestItemIndex} = this;
+  render(ctx, size) {
+    const {
+      generation, items, bestItemIndex,
+    } = this;
+
+    ctx.fillStyle = '#fff';
+    ctx.font = '12px Arial';
+    ctx.fillText(`Generation: ${generation}`, size.w - 210, 20);
 
     for (let i = 0, n = items.length; i < n; ++i) {
       const item = items[i];
