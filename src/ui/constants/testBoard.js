@@ -1,5 +1,5 @@
 import vec2 from 'logic/math/vec2';
-import {Polygon} from '../views/objects';
+import {Polygon} from '../views/shared/objects';
 
 export default [
   // top line

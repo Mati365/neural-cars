@@ -1,8 +1,8 @@
 import GAME_VIEWS from 'ui/constants/gameViews';
-import * as Items from './items';
+import * as Boards from './boards';
 
 export default {
-  [GAME_VIEWS.LOADING]: Items.Loading,
-  [GAME_VIEWS.GAME]: Items.Game,
-  [GAME_VIEWS.EDITOR]: Items.Editor,
+  [GAME_VIEWS.LOADING]: Boards.Loading,
+  [GAME_VIEWS.GAME]: Boards.Game,
+  [GAME_VIEWS.EDITOR]: Boards.Editor,
 };

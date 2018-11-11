@@ -1,8 +1,6 @@
 import {vec2, dimensions} from 'logic/math';
 import {CtxUtils} from 'ui/utils';
 
-import GameView from '../GameView';
-
 /**
  * Layer that renders dots in provided size in render method
  *
@@ -44,12 +42,4 @@ class EditorCellSheet {
   }
 }
 
-export default class Editor extends GameView {
-  sheet = new EditorCellSheet;
-
-  render(ctx, size) {
-    const {sheet} = this;
-
-    sheet.render(ctx, size);
-  }
-}
+export default EditorCellSheet;

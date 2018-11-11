@@ -3,8 +3,8 @@ import TEST_BOARD from 'ui/constants/testBoard';
 import toRadians from 'logic/math/toRadians';
 
 import GameView from '../GameView';
-import {NeuralCarPopulation} from '../neural';
-import {Camera} from '../objects';
+import {NeuralCarPopulation} from '../game/neural';
+import {Camera} from '../shared/objects';
 
 /**
  * Shows game simulation
