@@ -12,9 +12,6 @@ const INITIAL_STATE = {
     },
   },
 
-  // todo: cars AI
-  neural: {},
-
   // board
   board: {
     segments: [
