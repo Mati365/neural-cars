@@ -12,7 +12,7 @@ class EditorCellSheet {
     offscreenCells = 2,
     cellSize = dimensions(24, 24),
     pointRadius = 1,
-    pointColor = '#4a4949',
+    pointColor = '#333333',
   } = {}) {
     this.offscreenCells = offscreenCells;
     this.cellSize = cellSize;

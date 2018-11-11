@@ -46,7 +46,7 @@ export default class LoadingView extends GameView {
       globalResLoadingPercentage(prevState) !== newLoadingPercentage
         && newLoadingPercentage === 1.0
     ) {
-      this.loadView(GAME_VIEWS.EDITOR);
+      this.loadView(GAME_VIEWS.GAME);
     }
   }
 

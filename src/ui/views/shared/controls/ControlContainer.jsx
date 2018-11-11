@@ -8,6 +8,8 @@ class ControlsContainer {
   constructor() {
     this.onMouseClick = this.execOnEachProxy('onMouseClick');
     this.onMouseMove = this.execOnEachProxy('onMouseMove');
+    this.onMouseUp = this.execOnEachProxy('onMouseUp');
+
     this.render = this.execOnEachProxy('render');
     this.update = this.execOnEachProxy('update');
   }

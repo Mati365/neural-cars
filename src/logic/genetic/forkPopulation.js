@@ -22,11 +22,11 @@ export const getWinnersByFitness = count => R.compose(
 
 const mutateValues = R.map(
   (gene) => {
-    if (Math.random() > 0.9)
-      return gene * getRandomNumber(1.0, 1.1);
+    if (Math.random() > 0.95)
+      return gene * getRandomNumber(1.01, 1.15);
 
-    if (Math.random() > 0.9)
-      return gene + getRandomNumber(-0.15, 0.15);
+    if (Math.random() > 0.95)
+      return gene + getRandomNumber(-0.05, 0.05);
 
     return gene;
   },

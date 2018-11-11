@@ -1,10 +1,21 @@
-import TEST_BOARD from 'ui/constants/testBoard';
-
 import toRadians from 'logic/math/toRadians';
+import {CtxUtils} from 'ui/utils';
+
+import {
+  addVec2,
+  subVec2,
+} from 'logic/math/vec2';
+
+import {
+  vec2,
+  dimensions,
+} from 'logic/math';
 
 import GameView from '../GameView';
 import {NeuralCarPopulation} from '../game/neural';
 import {Camera} from '../shared/objects';
+
+import generateBoard from '../game/generateBoard';
 
 /**
  * Shows game simulation
@@ -13,7 +24,16 @@ import {Camera} from '../shared/objects';
  * @export
  */
 export default class GameMainView extends GameView {
-  board = TEST_BOARD;
+  board = generateBoard({
+    startPoint: vec2(170, 40),
+    startAngle: [0, 1],
+
+    segmentsCount: 50,
+    segmentSize: dimensions(
+      [40, 100], // width
+      80, // height
+    ),
+  });
 
   /**
    * All car items on map! Do not place there more than 40 cars,
@@ -84,9 +104,38 @@ export default class GameMainView extends GameView {
       size,
     );
 
-    // logs
-    ctx.fillStyle = '#fff';
+    // titles
     ctx.font = '12px Arial';
+
+    // best item title
+    const {bestItem} = population;
+    if (bestItem) {
+      const color = '#0080FF';
+
+      // position relative to top left canvas origin
+      const fixedPos = addVec2(
+        subVec2(bestItem.car.body.pos, camera.pos),
+        vec2(size.w / 2, size.h / 2),
+      );
+
+      CtxUtils.drawLine(
+        vec2(fixedPos.x, fixedPos.y),
+        vec2(fixedPos.x, size.h - 20),
+        color,
+        1,
+        ctx,
+      );
+
+      ctx.fillStyle = color;
+      ctx.fillText(
+        `Winner: ${bestItem.totalDistance.toFixed(2)}px`,
+        fixedPos.x - 50,
+        size.h - 6,
+      );
+    }
+
+    // generation log
+    ctx.fillStyle = '#fff';
     ctx.fillText(`Generation: ${population.generation}`, size.w - 210, 20);
   }
 }
