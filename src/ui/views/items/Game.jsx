@@ -1,9 +1,10 @@
+import TEST_BOARD from 'ui/constants/testBoard';
+
 import toRadians from 'logic/math/toRadians';
-import vec2 from 'logic/math/vec2';
 
 import GameView from '../GameView';
-import {Polygon} from '../objects';
 import {NeuralCarPopulation} from '../neural';
+import {Camera} from '../objects';
 
 /**
  * Shows game simulation
@@ -12,65 +13,13 @@ import {NeuralCarPopulation} from '../neural';
  * @export
  */
 export default class GameMainView extends GameView {
-  board = [
-    new Polygon(
-      [
-        vec2(100, 70),
-        vec2(200, 70),
-        vec2(200, 120),
-      ],
-    ),
+  board = TEST_BOARD;
 
-    new Polygon(
-      [
-        vec2(100, 170),
-        vec2(130, 320),
-        vec2(150, 220),
-      ],
-    ),
-
-    new Polygon(
-      [
-        vec2(220, 190),
-        vec2(320, 120),
-        vec2(300, 178),
-      ],
-    ),
-
-    new Polygon(
-      [
-        vec2(400, 270),
-        vec2(500, 220),
-        vec2(500, 420),
-      ],
-    ),
-
-    new Polygon(
-      [
-        vec2(540, 70),
-        vec2(420, 70),
-        vec2(420, 190),
-      ],
-    ),
-
-    new Polygon(
-      [
-        vec2(220, 340),
-        vec2(320, 320),
-        vec2(320, 420),
-      ],
-    ),
-
-    new Polygon(
-      [
-        vec2(5, 5),
-        vec2(635, 5),
-        vec2(635, 475),
-        vec2(5, 475),
-      ],
-    ),
-  ];
-
+  /**
+   * All car items on map! Do not place there more than 40 cars,
+   * it might be slow and place that number only when it is training mode,
+   * in production mode with Quad Tree optimization it should be propably fine
+   */
   population = new NeuralCarPopulation(
     30,
     {
@@ -93,13 +42,27 @@ export default class GameMainView extends GameView {
     },
   );
 
+  camera = new Camera;
+
   update(delta) {
-    const {population, board} = this;
+    const {population, board, camera} = this;
 
     population.update(delta, board);
+    camera
+      .moveTo(population.bestItem.car.body.pos)
+      .update(delta);
   }
 
-  render(ctx, size) {
+  /**
+   * Population is render but focused only on the best item
+   *
+   * @see
+   *  It is binded to class this context!
+   *
+   * @param {Context2D} ctx
+   * @param {Rect}      size
+   */
+  renderCameraViewport = (ctx, size) => {
     const {
       population,
       board,
@@ -109,5 +72,21 @@ export default class GameMainView extends GameView {
       board[i].render(ctx, size);
 
     population.render(ctx, size);
+  }
+
+  render(ctx, size) {
+    const {population, camera} = this;
+
+    // area
+    camera.render(
+      this.renderCameraViewport,
+      ctx,
+      size,
+    );
+
+    // logs
+    ctx.fillStyle = '#fff';
+    ctx.font = '12px Arial';
+    ctx.fillText(`Generation: ${population.generation}`, size.w - 210, 20);
   }
 }

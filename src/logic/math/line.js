@@ -108,7 +108,13 @@ export const extractRectCornersLines = ({
   /** RIGHT */ lineFromPoints(topRight.x, topRight.y, bottomRight.x, bottomRight.y),
 ]);
 
-export const pickPercentageIntersectDistance = item => item.meta.uA;
+/**
+ * Each ray should contain meta about collision point, uA is distance
+ * from source of tested vector to intersection in normalized form
+ *
+ * @param {IntersectPoint}  intersection
+ */
+export const pickPercentageIntersectDistance = intersection => intersection.meta.uA;
 
 /**
  * Compares uA values between to intersection vectors,
@@ -153,6 +159,7 @@ export const findLinesRayIntersect = (lines, ray) => {
  * Picks intersect distance with lowest uA
  *
  * @param {Ray} ray
+ *
  * @returns {Point}
  */
 export const getClosestRayIntersectPoint = (ray) => {

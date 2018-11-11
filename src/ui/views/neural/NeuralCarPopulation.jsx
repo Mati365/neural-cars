@@ -13,6 +13,11 @@ import {Car} from '../objects';
 export default class NeuralCarPopulation {
   generation = 0;
 
+  /**
+   * Best item taken from current generation
+   */
+  bestItem = null;
+
   constructor(size, defaultCarConfig) {
     this.size = size;
     this.defaultCarConfig = defaultCarConfig;
@@ -34,7 +39,8 @@ export default class NeuralCarPopulation {
   }
 
   /**
-   * Creates new cars population
+   * Creates new cars population only if actual generation
+   * is better than previous, otherwise - kill it and try again
    */
   nextGeneration() {
     const {prevItems} = this;
@@ -44,7 +50,7 @@ export default class NeuralCarPopulation {
 
     // prevent whole population regression
     if (prevItems && getWinnerFitness(prevItems) > getWinnerFitness(items)) {
-      console.warn('regression!', getWinnerFitness(prevItems), getWinnerFitness(items));
+      console.warn('regression detected, kill population!');
       items = this.prevItems;
     }
 
@@ -55,7 +61,8 @@ export default class NeuralCarPopulation {
   }
 
   /**
-   * Polymorphic population updater
+   * Polymorphic population updater. If all items from array are
+   * dead - reset population and check if has regression
    *
    * @param {Number}  delta
    * @param {Board}   board
@@ -63,12 +70,12 @@ export default class NeuralCarPopulation {
   update(delta, board) {
     const {items} = this;
     let allKilled = true;
-    let bestIndex = null;
+    let bestItem = null;
 
     for (let i = 0, n = items.length; i < n; ++i) {
       const item = items[i];
-      if (bestIndex === null || item.fitness >= items[bestIndex].fitness)
-        bestIndex = i;
+      if (bestItem === null || item.fitness >= bestItem.fitness)
+        bestItem = item;
 
       if (!item.killed) {
         allKilled = false;
@@ -76,7 +83,7 @@ export default class NeuralCarPopulation {
       }
     }
 
-    this.bestItemIndex = bestIndex;
+    this.bestItem = bestItem;
     if (allKilled)
       this.nextGeneration();
   }
@@ -86,21 +93,16 @@ export default class NeuralCarPopulation {
    *
    * @param {Context2D} ctx
    */
-  render(ctx, size) {
+  render(ctx) {
     const {
-      generation, items, bestItemIndex,
+      items, bestItem,
     } = this;
-
-    ctx.fillStyle = '#fff';
-    ctx.font = '12px Arial';
-    ctx.fillText(`Generation: ${generation}`, size.w - 210, 20);
 
     for (let i = 0, n = items.length; i < n; ++i) {
       const item = items[i];
       item.render(ctx);
     }
 
-    if (bestItemIndex !== null)
-      items[bestItemIndex].render(ctx, '#00ff00');
+    bestItem?.render(ctx, '#00ff00');
   }
 }
