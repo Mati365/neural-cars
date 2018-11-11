@@ -3,18 +3,19 @@ import {getNeuronActivationFn} from '../neuron';
 /**
  * Sums all weights and neuron from previous layer
  *
+ * @param {Neuron}  neuron
  * @param {Layer}   layer
  * @param {Number}  neuronIndex
  *
  * @returns {Number}
  */
-export const getNeuronsWeightsSum = (layer, neuronIndex) => {
+export const getNeuronsWeightsSum = (neuron, layer, neuronIndex) => {
   const {
     neuronsMatrix: prevLayerNeurons,
     weightsMatrix: prevLayerWeights,
   } = layer;
 
-  let sum = 0;
+  let sum = neuron.bias;
   for (let pNeuronIndex = prevLayerNeurons.length - 1; pNeuronIndex >= 0; --pNeuronIndex)
     sum += prevLayerNeurons[pNeuronIndex].value * prevLayerWeights[pNeuronIndex][neuronIndex];
 
@@ -52,7 +53,7 @@ const forwardPropagate = (input, network) => {
       const neuron = layerNeurons[j];
 
       neuron.value = getNeuronActivationFn(neuron).plain(
-        getNeuronsWeightsSum(layers[i - 1], j) + neuron.bias,
+        getNeuronsWeightsSum(neuron, layers[i - 1], j),
       );
     }
   }

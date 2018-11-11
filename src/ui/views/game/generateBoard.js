@@ -17,7 +17,13 @@ const generateBoard = ({
   segmentsCount,
   segmentSize,
 }) => {
+  const randomBend = () => (
+    6 * Math.sign(getRandomNumber(-1, 1))
+  );
+
   let currentAngle = toRadians(getRandomFromRange(startAngle));
+  let bend = randomBend();
+
   const path = [
     {
       angle: currentAngle,
@@ -39,7 +45,17 @@ const generateBoard = ({
       ),
     });
 
-    currentAngle += getRandomNumber(-0.1, 0.1);
+    if (bend === 1)
+      bend = 6 * (-Math.sign(bend));
+
+    const angleDelta = (
+      bend < 0
+        ? getRandomNumber(-0.1, -0.1)
+        : getRandomNumber(0.1, 0.1)
+    );
+
+    bend = Math.sign(bend) * (Math.abs(bend) - 1);
+    currentAngle += angleDelta;
   }
 
   const polygonMapper = dir => R.map(

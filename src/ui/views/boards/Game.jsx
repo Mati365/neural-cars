@@ -28,9 +28,9 @@ export default class GameMainView extends GameView {
     startPoint: vec2(170, 40),
     startAngle: [0, 1],
 
-    segmentsCount: 50,
+    segmentsCount: 40,
     segmentSize: dimensions(
-      [40, 100], // width
+      [80, 120], // width
       80, // height
     ),
   });
@@ -128,8 +128,8 @@ export default class GameMainView extends GameView {
 
       ctx.fillStyle = color;
       ctx.fillText(
-        `Winner: ${bestItem.totalDistance.toFixed(2)}px`,
-        fixedPos.x - 50,
+        `Best: ${bestItem.totalDistance.toFixed(2)}px`,
+        fixedPos.x - 32,
         size.h - 6,
       );
     }

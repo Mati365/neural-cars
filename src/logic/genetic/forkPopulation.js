@@ -22,11 +22,11 @@ export const getWinnersByFitness = count => R.compose(
 
 const mutateValues = R.map(
   (gene) => {
-    if (Math.random() > 0.95)
+    if (Math.random() > 0.98)
       return gene * getRandomNumber(1.01, 1.15);
 
-    if (Math.random() > 0.95)
-      return gene + getRandomNumber(-0.05, 0.05);
+    if (Math.random() > 0.98)
+      return gene + getRandomNumber(-0.15, 0.15);
 
     return gene;
   },
@@ -103,20 +103,10 @@ const createNeuralMutator = winnersNeurals => R.compose(
  */
 const forkPopulation = (neuralItems) => {
   const winners = getWinnersByFitness(4)(neuralItems);
-  const mutate = createNeuralMutator(winners); // it is just schema
+  const mutateNeural = createNeuralMutator(winners); // it is just schema
 
   return R.compose(
-    R.addIndex(R.map)(
-      (item, index) => {
-        // save winrars in neural network
-        // prevent regression!
-        if (index < winners.length)
-          return winners[index].neural;
-
-        // mutate other childs
-        return mutate(item);
-      },
-    ),
+    R.map(mutateNeural),
     pluckNeural,
   )(neuralItems);
 };

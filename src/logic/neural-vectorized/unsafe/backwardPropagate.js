@@ -67,12 +67,13 @@ const backwardPropagate = (learningRate, preferredOutput, network) => {
     // Delta output sum = S'(sum) * (output sum margin of error)
     const delta = preferredOutput[i] - neuron.value;
     const sum = getNeuronsWeightsSum(
+      neuron,
       layers[hiddenLayerLastIndex],
       i,
     );
 
     neuron.errorDelta = (
-      getNeuronActivationFn(neuron).derivative(sum + neuron.bias) * delta
+      getNeuronActivationFn(neuron).derivative(sum) * delta
     );
   }
 
@@ -104,7 +105,7 @@ const backwardPropagate = (learningRate, preferredOutput, network) => {
 
       // delta(x) = (neuron.delta(x + 1) * weight(x, x + 1)) + ...) * derivative(sum)
       neuron.errorDelta = (
-        outputDeltaSum * getNeuronActivationFn(neuron).derivative(inputSum + neuron.bias)
+        outputDeltaSum * getNeuronActivationFn(neuron).derivative(inputSum)
       );
     }
   }
