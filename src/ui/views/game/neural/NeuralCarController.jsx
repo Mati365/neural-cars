@@ -2,7 +2,7 @@ import * as R from 'ramda';
 
 import * as T from 'logic/neural-vectorized';
 
-import {normalizeAngle} from 'logic/math/toRadians';
+// import {normalizeAngle} from 'logic/math/toRadians';
 import {clamp} from 'logic/math';
 import {
   vec2Distance,
@@ -11,7 +11,7 @@ import {
 
 const NEURAL_CAR_INPUTS = {
   SPEED_INPUT: 0,
-  ANGLE_INPUT: 1,
+  // ANGLE_INPUT: 1,
 };
 
 const NEURAL_CAR_OUTPUTS = {
@@ -84,7 +84,7 @@ export default class NeuralClass {
     const neuralOutput = T.exec(
       [
         body.speed / body.maxSpeed, // nornalize speed
-        normalizeAngle(body.angle),
+        // normalizeAngle(body.steerAngle),
         ...intersectRays.pickRaysClosestIntersects(),
       ],
       neural,
@@ -93,13 +93,13 @@ export default class NeuralClass {
     body.steerAngle = clamp(
       -body.maxSteerAngle,
       body.maxSteerAngle,
-      body.steerAngle + (neuralOutput[1] * delta / 35),
+      body.steerAngle + (neuralOutput[1] * delta / 30),
     );
 
     body.speed = clamp(
       body.maxSpeed / 2,
       body.maxSpeed,
-      body.speed + neuralOutput[0] * delta / 30,
+      body.speed + (neuralOutput[0] * delta / 30),
     );
   }
 

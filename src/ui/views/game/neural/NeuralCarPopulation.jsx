@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 
-import forkPopulation, {getWinnerFitness} from 'logic/genetic/forkPopulation';
+import forkPopulation from 'logic/genetic/forkPopulation';
 
 import NeuralCarController from './NeuralCarController';
 import {Car} from '../objects';
@@ -43,16 +43,16 @@ export default class NeuralCarPopulation {
    * is better than previous, otherwise - kill it and try again
    */
   nextGeneration() {
-    const {prevItems} = this;
-    let {items} = this;
+    // const {prevItems} = this;
+    const {items} = this;
 
     this.generation++;
 
     // prevent whole population regression
-    if (prevItems && getWinnerFitness(prevItems) > getWinnerFitness(items)) {
-      console.warn('regression detected, kill population!');
-      items = this.prevItems;
-    }
+    // if (prevItems && getWinnerFitness(prevItems) > getWinnerFitness(items)) {
+    //   console.warn('regression detected, kill population!');
+    //   items = this.prevItems;
+    // }
 
     this.prevItems = items;
     this.items = this.createGeneration(

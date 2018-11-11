@@ -20,24 +20,27 @@ export const getWinnersByFitness = count => R.compose(
   R.sortBy(pickFitness),
 );
 
-const mutateValues = R.map(
+const mutateValues = mutateRate => R.map(
   (gene) => {
-    if (Math.random() > 0.98)
-      return gene * getRandomNumber(1.01, 1.15);
-
-    if (Math.random() > 0.98)
-      return gene + getRandomNumber(-0.15, 0.15);
+    if (Math.random() > mutateRate)
+      return gene * (1 + ((Math.random() - 0.5) * 3 + (Math.random() - 0.5)));
 
     return gene;
   },
 );
 
 const crossoverValues = (geneA, geneB) => {
-  const slicePoint = getRandomNumber(0, geneA.length - 1);
+  const [_geneA, _geneB] = (
+    Math.random() > 0.5
+      ? [geneA, geneB]
+      : [geneB, geneA]
+  );
+
+  const slicePoint = getRandomNumber(0, _geneA.length - 1);
 
   return [
-    ...geneA.slice(0, slicePoint),
-    ...geneB.slice(slicePoint, geneB.length),
+    ..._geneA.slice(0, slicePoint),
+    ..._geneB.slice(slicePoint, _geneB.length),
   ];
 };
 
@@ -49,44 +52,49 @@ const crossoverGenes = (neuralA, neuralB) => {
   );
 
   return {
-    ..._a,
+    weights: crossoverValues(_a.weights, _b.weights),
     biases: crossoverValues(_a.biases, _b.biases),
   };
 };
 
-/**
- * Evolves neural network based on parents genes
- *
- * @param {1DNeuralNetwork[]} winners1D
- */
-const evolve1DNeurals = winners1D => () => {
-  const crossedNeural = (
-    Math.random() > 0.95
-      ? crossoverGenes(
-        selectRandomFromArray(winners1D),
-        selectRandomFromArray(winners1D),
-      )
-      : crossoverGenes(winners1D[0], winners1D[1])
-  );
-
-  return R.mapObjIndexed(
-    mutateValues,
-    crossedNeural,
-  );
-};
+const mutate1DNeural = mutateRate => R.mapObjIndexed(
+  mutateValues(mutateRate),
+);
 
 /**
  * Creates mutation chain for neural network.
  * neuralSchema is used only for restore 1D neural network
  *
+ * @param {Number}          mutateRate
  * @param {NeuralNetwork[]} winnersNeurals
  */
-const createNeuralMutator = winnersNeurals => R.compose(
-  T.restoreFrom1D(winnersNeurals[0]),
-  evolve1DNeurals(
-    R.map(T.dumpTo1D, winnersNeurals),
-  ),
-);
+const createNeuralMutator = (mutateRate, winnersNeurals) => {
+  const winners1D = R.map(T.dumpTo1D, winnersNeurals);
+
+  return (itemIndex, total) => {
+    let new1D = null;
+
+    // first is made from the best items
+    if (!itemIndex)
+      [new1D] = winners1D;
+
+    else if (itemIndex <= 3)
+      new1D = crossoverGenes(winners1D[0], winners1D[1]);
+
+    else if (itemIndex < total - 3) {
+      new1D = crossoverGenes(
+        selectRandomFromArray(winners1D),
+        selectRandomFromArray(winners1D),
+      );
+    } else
+      new1D = selectRandomFromArray(winners1D);
+
+    return R.compose(
+      T.restoreFrom1D(winnersNeurals[0]),
+      mutate1DNeural(mutateRate),
+    )(new1D);
+  };
+};
 
 /**
  * @param {NeuralItem[]}  neuralItems
@@ -103,10 +111,12 @@ const createNeuralMutator = winnersNeurals => R.compose(
  */
 const forkPopulation = (neuralItems) => {
   const winners = getWinnersByFitness(4)(neuralItems);
-  const mutateNeural = createNeuralMutator(winners); // it is just schema
+  const mutateNeural = createNeuralMutator(0.97, winners); // it is just schema
 
   return R.compose(
-    R.map(mutateNeural),
+    R.addIndex(R.map)(
+      (item, index) => mutateNeural(index, neuralItems.length, item),
+    ),
     pluckNeural,
   )(neuralItems);
 };
