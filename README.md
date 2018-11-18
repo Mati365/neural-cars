@@ -5,7 +5,8 @@
 Cars game AI using neural networks. It was created for school project. <br />
 Project description: https://docs.google.com/document/d/1u7fDBV9NCf-xRV-GDvArxJ9axhejs6CmyEw2IXDNvZg/edit?usp=sharing
 
-PR welcome
+## Screens
+![Cars preview](/doc/cars-preview.gif)
 
 ## Install
 Steps to run:
