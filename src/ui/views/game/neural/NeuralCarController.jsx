@@ -11,7 +11,7 @@ import {
 
 const NEURAL_CAR_INPUTS = {
   SPEED_INPUT: 0,
-  // ANGLE_INPUT: 0,
+  ANGLE_INPUT: 1,
 };
 
 const NEURAL_CAR_OUTPUTS = {
