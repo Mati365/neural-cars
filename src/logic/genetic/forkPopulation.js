@@ -1,6 +1,10 @@
 import * as R from 'ramda';
 
-import getRandomNumber, {selectRandomFromArray} from 'utils/getRandomNumber';
+import getRandomNumber, {
+  selectRandomFromArray,
+  getRandomIntInclusive,
+} from 'utils/getRandomNumber';
+
 import * as T from 'logic/neural-vectorized';
 
 const pickFitness = R.prop('fitness');
@@ -23,30 +27,24 @@ export const getWinnersByFitness = count => R.compose(
 const mutateValues = mutateRate => R.map(
   (gene) => {
     if (Math.random() > mutateRate)
-      return gene * (1 + ((Math.random() - 0.5) * 3 + (Math.random() - 0.5)));
+      return getRandomNumber(-0.15, 0.15) + gene * (1 + getRandomNumber(-0.15, 0.15));
 
     return gene;
   },
 );
 
 const crossoverValues = (geneA, geneB) => {
-  const [_geneA, _geneB] = (
-    Math.random() > 0.5
-      ? [geneA, geneB]
-      : [geneB, geneA]
-  );
-
-  const slicePoint = getRandomNumber(0, _geneA.length - 1);
+  const slicePoint = getRandomIntInclusive(0, geneA.length - 1);
 
   return [
-    ..._geneA.slice(0, slicePoint),
-    ..._geneB.slice(slicePoint, _geneB.length),
+    ...geneA.slice(0, slicePoint),
+    ...geneB.slice(slicePoint, geneB.length),
   ];
 };
 
 const crossoverGenes = (neuralA, neuralB) => {
   const [_a, _b] = (
-    Math.random() > 0.5
+    Math.random() > 0.25
       ? [neuralA, neuralB]
       : [neuralB, neuralA]
   );
@@ -111,7 +109,7 @@ const createNeuralMutator = (mutateRate, winnersNeurals) => {
  */
 const forkPopulation = (neuralItems) => {
   const winners = getWinnersByFitness(4)(neuralItems);
-  const mutateNeural = createNeuralMutator(0.97, winners); // it is just schema
+  const mutateNeural = createNeuralMutator(0.94, winners); // it is just schema
 
   return R.compose(
     R.addIndex(R.map)(

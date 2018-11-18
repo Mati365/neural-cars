@@ -140,8 +140,8 @@ class CarsCanvas extends React.Component {
         <SimulationCanvas
           innerRef={this.canvasRef}
           size={{
-            w: 640,
-            h: 480,
+            w: window.innerWidth,
+            h: window.innerHeight,
           }}
           onUpdateSimulation={this.onUpdate}
           onRenderSimulation={this.onRender}

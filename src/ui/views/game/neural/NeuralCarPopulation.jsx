@@ -18,9 +18,16 @@ export default class NeuralCarPopulation {
    */
   bestItem = null;
 
-  constructor(size, defaultCarConfig) {
+  constructor(
+    size,
+    defaultCarConfig,
+    {
+      onNewPopulation,
+    } = {},
+  ) {
     this.size = size;
     this.defaultCarConfig = defaultCarConfig;
+    this.onNewPopulation = onNewPopulation;
 
     // creates new population of cars
     this.items = this.createGeneration();
@@ -44,7 +51,7 @@ export default class NeuralCarPopulation {
    */
   nextGeneration() {
     // const {prevItems} = this;
-    const {items} = this;
+    const {items, onNewPopulation} = this;
 
     this.generation++;
 
@@ -58,6 +65,9 @@ export default class NeuralCarPopulation {
     this.items = this.createGeneration(
       forkPopulation(items),
     );
+
+    if (onNewPopulation)
+      onNewPopulation(this.items, this.generation);
   }
 
   /**

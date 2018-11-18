@@ -19,9 +19,15 @@ export const NEURAL_ACTIVATION_TYPES = {
   TAN_H: 0,
   SIGMOID_UNIPOLAR: 1,
   SIGMOID_BIPOLAR: 2,
+  RELU: 3,
 };
 
 const NeuralActivationFn = {
+  [NEURAL_ACTIVATION_TYPES.RELU]: {
+    plain: x => Math.max(0, x),
+    derivative: x => +(x > 0), // x > 0 => 1, x <= 0 => 0
+  },
+
   [NEURAL_ACTIVATION_TYPES.TAN_H]: {
     plain: Math.tanh,
     derivative: x => 1 - (x ** 2),

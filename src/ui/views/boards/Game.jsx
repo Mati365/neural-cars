@@ -17,6 +17,17 @@ import {Camera} from '../shared/objects';
 
 import generateBoard from '../game/generateBoard';
 
+const generateCarsBoard = () => generateBoard({
+  startPoint: vec2(170, 40),
+  startAngle: [0, 1],
+
+  segmentsCount: 40,
+  segmentSize: dimensions(
+    [80, 120], // width
+    80, // height
+  ),
+});
+
 /**
  * Shows game simulation
  *
@@ -24,16 +35,7 @@ import generateBoard from '../game/generateBoard';
  * @export
  */
 export default class GameMainView extends GameView {
-  board = generateBoard({
-    startPoint: vec2(170, 40),
-    startAngle: [0, 1],
-
-    segmentsCount: 40,
-    segmentSize: dimensions(
-      [80, 120], // width
-      80, // height
-    ),
-  });
+  board = generateCarsBoard();
 
   /**
    * All car items on map! Do not place there more than 40 cars,
@@ -41,12 +43,12 @@ export default class GameMainView extends GameView {
    * in production mode with Quad Tree optimization it should be propably fine
    */
   population = new NeuralCarPopulation(
-    30,
+    60,
     {
       angle: toRadians(90),
       steerAngle: toRadians(0),
-      speed: 2.5,
-      maxSpeed: 3.5,
+      speed: 1.5,
+      maxSpeed: 5.5,
 
       // car mass center position
       pos: {
@@ -60,6 +62,12 @@ export default class GameMainView extends GameView {
         h: 64,
       },
     },
+    // {
+    //   // regenerate whole board every new generation
+    //   onNewPopulation: () => {
+    //     this.board = generateCarsBoard();
+    //   },
+    // },
   );
 
   camera = new Camera;

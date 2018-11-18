@@ -2,7 +2,7 @@ import * as R from 'ramda';
 
 import * as T from 'logic/neural-vectorized';
 
-// import {normalizeAngle} from 'logic/math/toRadians';
+import {normalizeAngle} from 'logic/math/toRadians';
 import {clamp} from 'logic/math';
 import {
   vec2Distance,
@@ -11,7 +11,7 @@ import {
 
 const NEURAL_CAR_INPUTS = {
   SPEED_INPUT: 0,
-  // ANGLE_INPUT: 1,
+  // ANGLE_INPUT: 0,
 };
 
 const NEURAL_CAR_OUTPUTS = {
@@ -19,7 +19,9 @@ const NEURAL_CAR_OUTPUTS = {
   TURN_INPUT: 1,
 };
 
-const createBipolarLayer = T.createLayer(T.NEURAL_ACTIVATION_TYPES.SIGMOID_BIPOLAR);
+// const createBipolarLayer = T.createLayer(T.NEURAL_ACTIVATION_TYPES.SIGMOID_BIPOLAR);
+
+const createBipolarLayer = T.createLayer(T.NEURAL_ACTIVATION_TYPES.TAN_H);
 
 /**
  * Creates basic game neural network
@@ -37,6 +39,7 @@ const createCarNeural = (raysCount) => {
     createBipolarLayer(
       Math.floor(inputCount * 2 / 3) + outputsCount,
     ),
+    // createBipolarLayer(outputsCount * 2),
     createBipolarLayer(outputsCount),
   ]);
 };
@@ -83,9 +86,12 @@ export default class NeuralClass {
     // neural control
     const neuralOutput = T.exec(
       [
-        body.speed / body.maxSpeed, // nornalize speed
-        // normalizeAngle(body.steerAngle),
-        ...intersectRays.pickRaysClosestIntersects(),
+        body.speed / body.maxSpeed * 5, // nornalize speed
+        normalizeAngle(body.steerAngle) * 5,
+        ...R.map(
+          num => (1 - num) * 5,
+          intersectRays.pickRaysClosestIntersects(),
+        ),
       ],
       neural,
     );
