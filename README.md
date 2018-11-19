@@ -7,6 +7,7 @@ Project description: https://docs.google.com/document/d/1u7fDBV9NCf-xRV-GDvArxJ9
 
 ## Screens
 ![Cars preview](/doc/cars-preview.gif)
+(gif)
 
 ## Install
 Steps to run:
