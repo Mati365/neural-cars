@@ -19,9 +19,7 @@ const NEURAL_CAR_OUTPUTS = {
   TURN_INPUT: 1,
 };
 
-// const createBipolarLayer = T.createLayer(T.NEURAL_ACTIVATION_TYPES.SIGMOID_BIPOLAR);
-
-const createBipolarLayer = T.createLayer(T.NEURAL_ACTIVATION_TYPES.TAN_H);
+const createTanH = T.createLayer(T.NEURAL_ACTIVATION_TYPES.TAN_H);
 
 /**
  * Creates basic game neural network
@@ -36,11 +34,10 @@ const createCarNeural = (raysCount) => {
 
   return T.createNeuralNetwork([
     T.createInputLayer(inputCount),
-    createBipolarLayer(
+    createTanH(
       Math.floor(inputCount * 2 / 3) + outputsCount,
     ),
-    // createBipolarLayer(outputsCount * 2),
-    createBipolarLayer(outputsCount),
+    createTanH(outputsCount),
   ]);
 };
 
