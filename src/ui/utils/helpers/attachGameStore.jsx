@@ -11,14 +11,6 @@ const INITIAL_STATE = {
       resources: null,
     },
   },
-
-  // board
-  board: {
-    segments: [
-      {id: 1, angle: 0.5, width: 10, pos: {x: 10, y: 10}},
-      {id: 1, angle: 0.5, width: 10, pos: {x: 20, y: 20}},
-    ],
-  },
 };
 
 const ACTIONS = {

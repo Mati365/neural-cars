@@ -1,5 +1,5 @@
 import * as R from 'ramda';
-import {pairs} from 'rxjs';
+import {pairs, of} from 'rxjs';
 import {scan, flatMap} from 'rxjs/operators';
 
 export const DEFAULT_LOADERS = [
@@ -56,6 +56,13 @@ export const createLoadersResourcesPack = R.curry(
   (loaders, resources) => {
     const packLoader = loadResource(loaders);
     const totalResources = R.keys(resources).length;
+
+    if (!totalResources) {
+      return of({
+        resources: {},
+        percentage: 1,
+      });
+    }
 
     return (
       pairs(resources)

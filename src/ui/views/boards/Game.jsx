@@ -62,12 +62,6 @@ export default class GameMainView extends GameView {
         h: 64,
       },
     },
-    // {
-    //   // regenerate whole board every new generation
-    //   onNewPopulation: () => {
-    //     this.board = generateCarsBoard();
-    //   },
-    // },
   );
 
   camera = new Camera;

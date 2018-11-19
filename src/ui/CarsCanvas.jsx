@@ -55,6 +55,9 @@ class CarsCanvas extends React.Component {
       onUpdateResourcesPackages,
     } = this.props;
 
+    // lazy load initial state
+    this.loadView(activeView);
+
     // resources loading stream
     createResourcesPack(resourcePack).subscribe((pack) => {
       onUpdateResourcesPackages(
@@ -63,9 +66,6 @@ class CarsCanvas extends React.Component {
         },
       );
     });
-
-    // lazy load initial state
-    this.loadView(activeView);
   }
 
   componentDidUpdate(prevProps) {
