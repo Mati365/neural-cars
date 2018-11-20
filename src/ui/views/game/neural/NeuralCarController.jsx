@@ -140,7 +140,6 @@ export default class NeuralClass {
    */
   update(delta, board) {
     const {car} = this;
-    this.killed = this.killed || this.hasCollision(board);
 
     if (!this.killed) {
       this.updateStats(board);
