@@ -3,7 +3,7 @@
 
 # Neural Cars
 Cars game AI using neural networks. It was created for school project. <br />
-Project description: https://docs.google.com/document/d/1u7fDBV9NCf-xRV-GDvArxJ9axhejs6CmyEw2IXDNvZg/edit?usp=sharing
+Project description (PL): https://docs.google.com/document/d/1OAMXwRRFsRtHq9gUi0FaPhLm1Ws-E_4H04qHzrwje1g/edit?usp=sharing
 
 ## Screens
 ![Cars preview](/doc/cars-preview.gif)

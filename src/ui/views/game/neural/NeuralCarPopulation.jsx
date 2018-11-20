@@ -54,13 +54,6 @@ export default class NeuralCarPopulation {
     const {items, onNewPopulation} = this;
 
     this.generation++;
-
-    // prevent whole population regression
-    // if (prevItems && getWinnerFitness(prevItems) > getWinnerFitness(items)) {
-    //   console.warn('regression detected, kill population!');
-    //   items = this.prevItems;
-    // }
-
     this.prevItems = items;
     this.items = this.createGeneration(
       forkPopulation(items),
