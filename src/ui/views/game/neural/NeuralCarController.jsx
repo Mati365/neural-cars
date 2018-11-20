@@ -83,10 +83,10 @@ export default class NeuralCarController {
     // neural control
     const neuralOutput = T.exec(
       [
-        body.speed / body.maxSpeed * 5, // nornalize speed
-        normalizeAngle(body.steerAngle) * 5,
+        body.speed / body.maxSpeed * 3, // nornalize speed
+        normalizeAngle(body.steerAngle) * 10,
         ...R.map(
-          num => (1 - num) * 5,
+          num => (1 - num) * 3,
           intersectRays.pickRaysClosestIntersects(),
         ),
       ],
@@ -140,6 +140,7 @@ export default class NeuralCarController {
    */
   update(delta, board) {
     const {car} = this;
+    this.killed = this.killed || this.hasCollision(board);
 
     if (!this.killed) {
       this.updateStats(board);
