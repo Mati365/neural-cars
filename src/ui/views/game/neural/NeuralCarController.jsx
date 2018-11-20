@@ -46,7 +46,7 @@ const createCarNeural = (raysCount) => {
  *
  * @export
  */
-export default class NeuralClass {
+export default class NeuralCarController {
   killed = false;
 
   constructor(car, neural) {
@@ -147,7 +147,7 @@ export default class NeuralClass {
 
       car.update(delta, board);
 
-      if (car.aabb.isCollisionDetected(board))
+      if (this.hasCollision(board))
         this.killed = true;
     }
   }
