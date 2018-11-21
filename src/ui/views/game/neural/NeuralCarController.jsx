@@ -2,7 +2,6 @@ import * as R from 'ramda';
 
 import * as T from 'logic/neural-vectorized';
 
-import {normalizeAngle} from 'logic/math/toRadians';
 import {clamp} from 'logic/math';
 import {
   vec2Distance,
