@@ -11,7 +11,7 @@ module.exports = {
   output: {
     path: OUTPUT_FOLDER,
     filename: '[name]-[hash].js',
-    publicPath: '/',
+    publicPath: '/neural-cars/',
   },
   resolve: {
     extensions: ['.js', '.jsx', '.json'],
