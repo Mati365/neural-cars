@@ -71,5 +71,3 @@ typings/
 
 # Serverless directories
 .serverless
-
-dist/
