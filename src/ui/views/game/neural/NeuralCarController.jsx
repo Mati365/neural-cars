@@ -2,7 +2,6 @@ import * as R from 'ramda';
 
 import * as T from 'logic/neural-vectorized';
 
-import {normalizeAngle} from 'logic/math/toRadians';
 import {clamp} from 'logic/math';
 import {
   vec2Distance,
@@ -84,7 +83,7 @@ export default class NeuralCarController {
     const neuralOutput = T.exec(
       [
         body.speed / body.maxSpeed * 3, // nornalize speed
-        normalizeAngle(body.steerAngle) * 10,
+        (body.steerAngle / body.maxSteerAngle) * 3,
         ...R.map(
           num => (1 - num) * 3,
           intersectRays.pickRaysClosestIntersects(),
