@@ -39,6 +39,7 @@
     "webpack-dev-server": "^3.1.9"
   },
   "scripts": {
-    "develop": "env NODE_ENV=development npx webpack-dev-server --config=config/webpack.config.js --mode=development"
+    "develop": "env NODE_ENV=development npx webpack-dev-server --config=config/webpack.config.js --mode=development",
+    "build:production": "env NODE_ENV=production npx webpack --config=config/webpack.config.js --mode=production"
   }
 }
