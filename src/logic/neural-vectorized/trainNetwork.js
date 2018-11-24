@@ -8,6 +8,8 @@ import * as T from './unsafe';
  *  Its is safe method, network provided via arg
  *  is copied and not modified. No side effects!
  *
+ *  It is not used at all
+ *
  * @param {Object[][]}  trainData
  * @param {Number}      learningRate
  * @param {Number}      times

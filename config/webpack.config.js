@@ -11,7 +11,7 @@ module.exports = {
   output: {
     path: OUTPUT_FOLDER,
     filename: '[name]-[hash].js',
-    publicPath: '/neural-cars/',
+    publicPath: process.env.NODE_ENV === 'production' ? '/neural-cars/' : '/',
   },
   resolve: {
     extensions: ['.js', '.jsx', '.json'],
